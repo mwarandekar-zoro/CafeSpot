@@ -35,7 +35,7 @@ export default function ReviewCard({ review, onEdit, onDelete, currentUserId }) 
   ];
 
   return (
-    <div className="glass fade-in" style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "16px" }}>
+    <div className="glass-flat fade-in" style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "16px" }}>
       <div className="flex-between" style={{ flexWrap: "wrap", gap: "12px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <div style={{

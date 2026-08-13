@@ -1,28 +1,15 @@
 import React from "react";
 
-export default function EmptyState({
-  title = "No cafes found",
-  description = "Try adjusting your search or filters to find what you are looking for.",
-  icon = "☕",
-  actionText,
-  onAction,
-}) {
+export default function EmptyState({ icon = "📭", title = "No items", description = "Nothing to show.", actionText, onAction }) {
   return (
-    <div className="glass flex-center fade-in w-full" style={{
-      padding: "48px 24px",
-      flexDirection: "column",
-      gap: "12px",
-      textAlign: "center",
-      maxWidth: "600px",
-      margin: "40px auto"
-    }}>
-      <div style={{ fontSize: "3.5rem", marginBottom: "8px" }}>{icon}</div>
-      <h3 style={{ fontFamily: "var(--font-serif)", fontSize: "1.5rem" }}>{title}</h3>
-      <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", maxWidth: "400px" }}>{description}</p>
+    <div className="glass" style={{ padding: "28px", textAlign: "center" }}>
+      <div style={{ fontSize: "2.2rem" }}>{icon}</div>
+      <h3 style={{ marginTop: "12px", fontFamily: "var(--font-serif)" }}>{title}</h3>
+      <p style={{ color: "var(--text-secondary)", marginTop: "8px" }}>{description}</p>
       {actionText && onAction && (
-        <button className="btn btn-primary btn-sm mt-4" onClick={onAction}>
-          {actionText}
-        </button>
+        <div style={{ marginTop: "16px" }}>
+          <button className="btn btn-primary" onClick={onAction}>{actionText}</button>
+        </div>
       )}
     </div>
   );

@@ -34,19 +34,7 @@ export default function Navbar() {
   });
 
   return (
-    <nav style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 1000,
-      height: "var(--navbar-h)",
-      background: scrolled ? "rgba(10, 10, 12, 0.85)" : "transparent",
-      backdropFilter: scrolled ? "blur(12px)" : "none",
-      WebkitBackdropFilter: scrolled ? "blur(12px)" : "none",
-      borderBottom: scrolled ? "1px solid var(--glass-border)" : "1px solid transparent",
-      transition: "background var(--transition), border-color var(--transition)"
-    }}>
+    <nav className={`navbar${scrolled ? " navbar-scrolled" : ""}`}>
       <div className="container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: "100%" }}>
         {/* Brand */}
         <Link to="/" style={{ display: "flex", alignItems: "center", gap: "8px" }} onClick={() => setMobileMenuOpen(false)}>
@@ -113,7 +101,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="glass fade-in" style={{
+        <div className="navbar-mobile-menu fade-in" style={{
           position: "absolute",
           top: "var(--navbar-h)",
           left: "16px",

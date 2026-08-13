@@ -32,31 +32,10 @@ export default function CafeCard({
   };
 
   return (
-    <div className="glass fade-in" style={{
-      overflow: "hidden",
-      display: "flex",
-      flexDirection: "column",
-      height: "100%",
-      transition: "transform var(--transition), box-shadow var(--transition)",
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.transform = "translateY(-4px)";
-      e.currentTarget.style.boxShadow = "var(--shadow-glow), var(--shadow-md)";
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.transform = "translateY(0)";
-      e.currentTarget.style.boxShadow = "var(--shadow-card)";
-    }}
-    >
+    <div className="glass-flat cafe-card fade-in">
       {/* Card Image Wrapper */}
-      <div style={{ position: "relative", width: "100%", height: "200px", overflow: "hidden" }}>
-        <img
-          src={coverImage}
-          alt={name}
-          style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.5s ease" }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-          onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
-        />
+      <div className="cafe-card-image-wrap">
+        <img src={coverImage} alt={name} className="cafe-card-image" />
         {/* Category Badge */}
         <div style={{ position: "absolute", top: "12px", left: "12px", zIndex: 2 }}>
           <span className="badge badge-accent">{category}</span>
@@ -64,27 +43,8 @@ export default function CafeCard({
         {/* Favorite Button */}
         <button
           onClick={handleFavClick}
-          style={{
-            position: "absolute",
-            top: "12px",
-            right: "12px",
-            zIndex: 2,
-            width: "36px",
-            height: "36px",
-            borderRadius: "50%",
-            background: "rgba(10, 10, 12, 0.6)",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-            backdropFilter: "blur(6px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "1.1rem",
-            color: isFavorited ? "#e05252" : "var(--text-primary)",
-            transition: "transform var(--transition)",
-            cursor: "pointer"
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.1)"}
-          onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+          className="cafe-card-fav-btn"
+          style={{ color: isFavorited ? "#e05252" : "var(--text-primary)" }}
         >
           {isFavorited ? "❤️" : "🤍"}
         </button>

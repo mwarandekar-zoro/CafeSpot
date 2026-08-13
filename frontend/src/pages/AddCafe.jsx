@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { cafeService } from "../services/cafeService";
+import { uploadService } from "../services/uploadService";
+
+const MAX_IMAGES = 6;
 
 export default function AddCafe() {
   const navigate = useNavigate();
@@ -12,11 +15,43 @@ export default function AddCafe() {
   const [category, setCategory] = useState("Coffee");
   const [priceRange, setPriceRange] = useState("$$");
   const [featureInput, setFeatureInput] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [images, setImages] = useState([]); // uploaded Cloudinary URLs
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const handleFileSelect = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    setUploadError("");
+
+    if (images.length + files.length > MAX_IMAGES) {
+      setUploadError(`You can upload up to ${MAX_IMAGES} photos total.`);
+      e.target.value = "";
+      return;
+    }
+
+    setUploadingImages(true);
+    try {
+      const res = await uploadService.uploadCafeImages(files);
+      if (res.success) {
+        setImages((prev) => [...prev, ...res.urls]);
+      }
+    } catch (err) {
+      setUploadError(err.response?.data?.message || err.message || "Failed to upload image(s).");
+    } finally {
+      setUploadingImages(false);
+      e.target.value = ""; // allow re-selecting the same file later
+    }
+  };
+
+  const handleRemoveImage = (index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,9 +70,6 @@ export default function AddCafe() {
         .split(",")
         .map((f) => f.trim())
         .filter((f) => f !== "");
-
-      // Parse single image URL into array
-      const images = imageUrl.trim() ? [imageUrl.trim()] : [];
 
       const payload = {
         name,
@@ -181,21 +213,77 @@ export default function AddCafe() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Image URL (Optional)</label>
-            <input
-              type="url"
-              className="form-input"
-              placeholder="https://images.unsplash.com/photo-..."
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-            />
+            <label className="form-label">Café Photos (up to {MAX_IMAGES})</label>
+
+            {images.length > 0 && (
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))",
+                gap: "10px",
+                marginBottom: "4px"
+              }}>
+                {images.map((url, i) => (
+                  <div key={url} style={{ position: "relative", borderRadius: "var(--radius-sm)", overflow: "hidden", aspectRatio: "1 / 1" }}>
+                    <img src={url} alt={`Upload ${i + 1}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(i)}
+                      aria-label="Remove photo"
+                      style={{
+                        position: "absolute",
+                        top: "4px",
+                        right: "4px",
+                        width: "22px",
+                        height: "22px",
+                        borderRadius: "50%",
+                        background: "rgba(10, 10, 12, 0.75)",
+                        border: "1px solid var(--glass-border-strong)",
+                        color: "var(--text-primary)",
+                        fontSize: "0.75rem",
+                        lineHeight: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer"
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {images.length < MAX_IMAGES && (
+              <label
+                className="btn btn-ghost btn-sm"
+                style={{ width: "fit-content", cursor: uploadingImages ? "not-allowed" : "pointer", opacity: uploadingImages ? 0.6 : 1 }}
+              >
+                {uploadingImages ? "Uploading…" : "+ Upload Photos"}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  onChange={handleFileSelect}
+                  disabled={uploadingImages}
+                  style={{ display: "none" }}
+                />
+              </label>
+            )}
+
+            {uploadError && (
+              <span style={{ fontSize: "0.8rem", color: "var(--error)" }}>{uploadError}</span>
+            )}
+            <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
+              JPG, PNG, or WEBP — up to 5MB each. First photo becomes the cover image.
+            </span>
           </div>
 
           <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", marginTop: "12px" }}>
             <button type="button" className="btn btn-ghost" onClick={() => navigate("/cafes")}>
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={submitting}>
+            <button type="submit" className="btn btn-primary" disabled={submitting || uploadingImages}>
               {submitting ? "Submitting Spot..." : "Submit Cafe"}
             </button>
           </div>

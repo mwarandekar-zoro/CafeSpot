@@ -268,7 +268,7 @@ export default function Profile() {
                   />
                 ) : (
                   myReviews.map((rev) => (
-                    <div key={rev._id} className="glass" style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                    <div key={rev._id} className="glass-flat" style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
                       <div className="flex-between">
                         <div>
                           <h4 style={{ fontSize: "1rem", fontWeight: "600", color: "var(--accent-light)" }}>

@@ -128,7 +128,7 @@ export default function OwnerDashboard() {
               {cafes.map((cafe) => {
                 const coverImage = cafe.images?.length > 0 ? cafe.images[0] : "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800";
                 return (
-                  <div key={cafe._id} className="glass flex-between fade-in" style={{ padding: "20px", flexWrap: "wrap", gap: "16px" }}>
+                  <div key={cafe._id} className="glass-flat flex-between fade-in" style={{ padding: "20px", flexWrap: "wrap", gap: "16px" }}>
                     <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "center" }}>
                       <img src={coverImage} alt={cafe.name} style={{ width: "90px", height: "70px", objectFit: "cover", borderRadius: "var(--radius-sm)" }} />
                       <div>

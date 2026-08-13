@@ -114,6 +114,36 @@ npm test
 - `owner` can create cafés and manage only those they created.
 - `admin` has global privileges across the app.
 
+## 🧭 Commit Messages & Contribution
+
+We follow a concise, conventional-style commit format to keep history readable. Examples you can use for common frontend/backend changes:
+
+- Feature (new UI, pages, API):
+  - `feat(frontend): add BackgroundBlobs component and update App layout`
+  - `feat(backend): add owner-dashboard route and controller`
+
+- Bugfix / Behavior change:
+  - `fix(frontend): prevent double-submit on register form`
+  - `fix(backend): validate cafe payload priceRange`
+
+- Styling / non-functional changes:
+  - `style(frontend): tweak nav spacing and glass shadows`
+
+- Chore / housekeeping:
+  - `chore: add .gitignore and update README`
+  - `chore: remove implementation_plan(1)`
+
+To commit and push your current work:
+
+```bash
+cd "C:\Users\MANTHAN\OneDrive\Desktop\PROJECT\CaféSpot"
+git add .
+git commit -m "feat(frontend): add BackgroundBlobs component and update App/index.css; remove implementation_plan(1)"
+git push
+```
+
+If you prefer smaller commits, split the changes into logical commits (UI feature, styles, cleanup). Short, present-tense subject lines are best.
+
 
 ---
 

@@ -12,6 +12,7 @@ import Register from "./pages/Register";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import BackgroundBlobs from "./components/BackgroundBlobs";
 import "./index.css";
 
 // ── Protected Route Helper ───────────────────────────────────────
@@ -35,7 +36,8 @@ function ProtectedRoute({ children, allowedRoles }) {
 
 function AppContent() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--bg)" }}>
+    <div className="app-shell">
+      <BackgroundBlobs />
       <Navbar />
       <div className="page-content" style={{ flexGrow: 1 }}>
         <Routes>

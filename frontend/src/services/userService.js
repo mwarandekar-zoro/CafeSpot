@@ -21,4 +21,8 @@ export const userService = {
     const { data } = await api.get("/users/favorites");
     return data; // { success, count, favorites }
   },
+  getOwnerDashboard: async () => {
+    const { data } = await api.get("/users/owner-dashboard");
+    return data; // { success, stats, cafes }
+  },
 };

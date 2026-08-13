@@ -6,8 +6,9 @@ const {
   getMyReviews,
   getMyCafes,
   getMyFavorites,
+  getOwnerDashboard,
 } = require("../controllers/userController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect, ownerOrAdminOnly } = require("../middleware/authMiddleware");
 
 // GET /api/users/profile   — get current user's profile
 // PUT /api/users/profile   — update name / profileImage
@@ -21,5 +22,8 @@ router.get("/cafes", protect, getMyCafes);
 
 // GET /api/users/favorites — cafes saved by current user
 router.get("/favorites", protect, getMyFavorites);
+
+// GET /api/users/owner-dashboard - stats and cafes for café owners
+router.get("/owner-dashboard", protect, ownerOrAdminOnly, getOwnerDashboard);
 
 module.exports = router;

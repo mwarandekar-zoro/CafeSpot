@@ -1,4 +1,16 @@
-# Logs
+node_modules/
+**/node_modules/
+backend/node_modules/
+frontend/node_modules/
+.env
+/.env
+dist/
+build/
+/.DS_Store
+/.idea
+/.vscode
+npm-debug.log
+yarn-error.log# Logs
 logs
 *.log
 npm-debug.log*

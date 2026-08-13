@@ -9,19 +9,28 @@ import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import OwnerDashboard from "./pages/OwnerDashboard";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import "./index.css";
 
 // ── Protected Route Helper ───────────────────────────────────────
-function ProtectedRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth();
+function ProtectedRoute({ children, allowedRoles }) {
+  const { isAuthenticated, user, loading } = useAuth();
 
   if (loading) {
     return <div style={{ minHeight: "100vh", background: "var(--bg)" }} />;
   }
 
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user?.role)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
 }
 
 function AppContent() {
@@ -38,8 +47,13 @@ function AppContent() {
 
           {/* Protected Routes */}
           <Route path="/add-cafe" element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["owner", "admin"]}>
               <AddCafe />
+            </ProtectedRoute>
+          } />
+          <Route path="/owner-dashboard" element={
+            <ProtectedRoute allowedRoles={["owner", "admin"]}>
+              <OwnerDashboard />
             </ProtectedRoute>
           } />
           <Route path="/favorites" element={

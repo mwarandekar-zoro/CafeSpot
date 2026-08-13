@@ -33,7 +33,7 @@ const userPayload = (user) => ({
 // ─────────────────────────────────────────────────────────────────
 const register = async (req, res) => {
   try {
-    const { name, email, password, confirmPassword } = req.body;
+    const { name, email, password, confirmPassword, role } = req.body;
 
     // ── 1. Validate required fields ──
     if (!name || !email || !password || !confirmPassword) {
@@ -61,7 +61,8 @@ const register = async (req, res) => {
     }
 
     // ── 4. Create user (password is hashed by the pre-save hook in User.js) ──
-    const user = await User.create({ name, email, password });
+    const finalRole = (role === "owner" || role === "visitor") ? role : "visitor";
+    const user = await User.create({ name, email, password, role: finalRole });
 
     // ── 5. Generate JWT and respond ──
     const token = generateToken(user._id);

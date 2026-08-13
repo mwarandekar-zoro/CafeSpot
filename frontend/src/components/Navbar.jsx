@@ -70,8 +70,12 @@ export default function Navbar() {
           <NavLink to="/cafes" style={navLinkStyle}>Cafes</NavLink>
           {isAuthenticated ? (
             <>
-              <NavLink to="/add-cafe" style={navLinkStyle}>Add Cafe</NavLink>
-              <NavLink to="/favorites" style={navLinkStyle}>Favorites</NavLink>
+              {(user?.role === "owner" || user?.role === "admin") && (
+                <NavLink to="/owner-dashboard" style={navLinkStyle}>Dashboard</NavLink>
+              )}
+              {user?.role === "visitor" && (
+                <NavLink to="/favorites" style={navLinkStyle}>Favorites</NavLink>
+              )}
               <NavLink to="/profile" style={navLinkStyle}>Profile</NavLink>
               <button
                 onClick={handleLogout}
@@ -124,8 +128,12 @@ export default function Navbar() {
           <Link to="/cafes" style={{ padding: "8px 0" }} onClick={() => setMobileMenuOpen(false)}>Cafes</Link>
           {isAuthenticated ? (
             <>
-              <Link to="/add-cafe" style={{ padding: "8px 0" }} onClick={() => setMobileMenuOpen(false)}>Add Cafe</Link>
-              <Link to="/favorites" style={{ padding: "8px 0" }} onClick={() => setMobileMenuOpen(false)}>Favorites</Link>
+              {(user?.role === "owner" || user?.role === "admin") && (
+                <Link to="/owner-dashboard" style={{ padding: "8px 0" }} onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
+              )}
+              {user?.role === "visitor" && (
+                <Link to="/favorites" style={{ padding: "8px 0" }} onClick={() => setMobileMenuOpen(false)}>Favorites</Link>
+              )}
               <Link to="/profile" style={{ padding: "8px 0" }} onClick={() => setMobileMenuOpen(false)}>Profile</Link>
               <button
                 onClick={handleLogout}

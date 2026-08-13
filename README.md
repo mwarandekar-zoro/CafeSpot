@@ -98,6 +98,23 @@ npm run dev
 
 Visit the app at **[http://localhost:5173](http://localhost:5173)**.
 
+## ✅ Tests
+
+- Run backend integration tests (Jest + Supertest + in-memory MongoDB):
+```bash
+cd backend
+npm install
+npm test
+```
+
+## 🧑‍💼 Owner / Visitor Roles
+
+- This release introduces a three-tier role system: `visitor`, `owner`, and `admin`.
+- `visitor` is the default role and cannot create/edit/delete cafés.
+- `owner` can create cafés and manage only those they created.
+- `admin` has global privileges across the app.
+
+
 ---
 
 ## 👥 Demo Credentials

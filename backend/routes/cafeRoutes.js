@@ -13,7 +13,7 @@ const {
   addReview,
 } = require("../controllers/reviewController");
 
-const { protect } = require("../middleware/authMiddleware");
+const { protect, ownerOrAdminOnly } = require("../middleware/authMiddleware");
 
 // ──────────────────────────────────────────────────────
 //  Cafe Routes
@@ -23,15 +23,15 @@ const { protect } = require("../middleware/authMiddleware");
 // POST /api/cafes  — Private (authenticated users only)
 router.route("/")
   .get(getCafes)
-  .post(protect, createCafe);
+  .post(protect, ownerOrAdminOnly, createCafe);
 
 // GET    /api/cafes/:id  — Public
 // PUT    /api/cafes/:id  — Private (owner or admin)
 // DELETE /api/cafes/:id  — Private (owner or admin)
 router.route("/:id")
   .get(getCafeById)
-  .put(protect, updateCafe)
-  .delete(protect, deleteCafe);
+  .put(protect, ownerOrAdminOnly, updateCafe)
+  .delete(protect, ownerOrAdminOnly, deleteCafe);
 
 // ──────────────────────────────────────────────────────
 //  Nested Review Routes  →  /api/cafes/:id/reviews

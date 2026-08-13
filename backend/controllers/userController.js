@@ -120,4 +120,47 @@ const getMyFavorites = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, getMyReviews, getMyCafes, getMyFavorites };
+// ─────────────────────────────────────────────────────────────────
+// @desc    Get Owner Dashboard analytics and cafes list
+// @route   GET /api/users/owner-dashboard
+// @access  Private (Owner/Admin)
+// ─────────────────────────────────────────────────────────────────
+const getOwnerDashboard = async (req, res) => {
+  try {
+    const cafes = await Cafe.find({ createdBy: req.user._id });
+    
+    const cafesWithStats = await Promise.all(
+      cafes.map(async (cafe) => {
+        const reviews = await Review.find({ cafe: cafe._id })
+          .populate("user", "name profileImage")
+          .sort({ createdAt: -1 })
+          .limit(5);
+
+        return {
+          ...cafe.toObject({ virtuals: true }),
+          recentReviews: reviews
+        };
+      })
+    );
+
+    const totalCafes = cafes.length;
+    const totalReviews = cafes.reduce((sum, c) => sum + (c.reviewCount || 0), 0);
+    const avgRating = totalCafes > 0 
+      ? Math.round((cafes.reduce((sum, c) => sum + (c.averageRating || 0), 0) / totalCafes) * 10) / 10
+      : 0;
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        totalCafes,
+        totalReviews,
+        averageRating: avgRating
+      },
+      cafes: cafesWithStats
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+module.exports = { getProfile, updateProfile, getMyReviews, getMyCafes, getMyFavorites, getOwnerDashboard };

@@ -6,8 +6,13 @@ const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 dotenv.config({ quiet: true });
 
-// ─── Connect to MongoDB ─────────────────────────────────────────
-connectDB();
+// Note: when the file is required as a module (for tests), we do NOT
+// automatically connect or start listening. Tests will control the
+// MongoDB lifecycle using an in-memory server.
+// ─── Connect to MongoDB (only when run directly) ─────────────────
+if (require.main === module) {
+  connectDB();
+}
 
 const app = express();
 
@@ -46,11 +51,15 @@ app.use("/api/users",     require("./routes/userRoutes"));
 app.use(notFound);
 app.use(errorHandler);
 
-// ─── Start Server ───────────────────────────────────────────────
+// ─── Start Server (only when run directly) ───────────────────────
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 CaféSpot server running on http://localhost:${PORT}`);
-  console.log(`📡 Health check: http://localhost:${PORT}/api/health`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 CaféSpot server running on http://localhost:${PORT}`);
+    console.log(`📡 Health check: http://localhost:${PORT}/api/health`);
+  });
+}
+
+module.exports = app;
 

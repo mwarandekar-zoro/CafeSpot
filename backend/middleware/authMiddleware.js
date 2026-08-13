@@ -64,5 +64,25 @@ const adminOnly = (req, res, next) => {
   });
 };
 
-module.exports = { protect, adminOnly };
+const ownerOnly = (req, res, next) => {
+  if (req.user && req.user.role === "owner") {
+    return next();
+  }
+  res.status(403).json({
+    success: false,
+    message: "Access denied. Owner privileges required.",
+  });
+};
+
+const ownerOrAdminOnly = (req, res, next) => {
+  if (req.user && (req.user.role === "owner" || req.user.role === "admin")) {
+    return next();
+  }
+  res.status(403).json({
+    success: false,
+    message: "Access denied. Owner or Admin privileges required.",
+  });
+};
+
+module.exports = { protect, adminOnly, ownerOnly, ownerOrAdminOnly };
 

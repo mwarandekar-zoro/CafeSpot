@@ -1,11 +1,24 @@
 # CaféSpot ☕ — Premium Café Vibe Discovery Platform
 
-A full-stack MERN application designed to help users discover the perfect café spot based on their specific vibe (Work, Study, Date, Chill, Budget). Includes a precision 6-category rating system, automated vibe scores, and live search/filters.
+A full-stack MERN application designed to help users discover the perfect café spot based on their specific vibe (Work, Study, Date, Chill, Budget). Includes a precision 6-category rating system, automated vibe scores, an interactive Map View (Leaflet + OpenStreetMap), and an Owner Analytics Dashboard with CSS spark charts.
 
 ---
 
-## 🚀 Technology Stack
-- **Frontend**: React (Vite), React Router, Axios, Custom Vanilla CSS Design System (Dark Night Café + Glassmorphism).
+## 🚀 Key Features
+- **Interactive Map View (Leaflet + OpenStreetMap)**: Plot cafés using real-time lat/lng coordinates. Styled using CartoDB Dark Matter tiles, custom category-themed glowing SVG pin markers, and glassmorphic popups that click through to details.
+- **Owner Analytics Dashboard**: Comprehensive dashboard featuring:
+  - Portfolio performance metrics (Aggregate rating, review volumes, average engagement).
+  - Expandable café cards displaying score breakdowns (Coffee, Food, Ambience, Wi-Fi, Quietness, Value) via CSS progress bars.
+  - 6-month review volume trends using pure CSS spark charts.
+  - Auto-generated "⭐ TOP" badge for the best performing café in the portfolio.
+- **Vibe Engine**: Automatically computes Work, Study, Date, Chill, and Budget scores based on customer reviews.
+- **Search & Filters**: Real-time filters by category, price tier, average rating, and vibe threshold.
+- **Modern Dark UI**: Fluid glassmorphism styled with custom CSS variables, custom SVG logo, and responsive mobile adaptation.
+
+---
+
+## 📦 Technology Stack
+- **Frontend**: React (Vite), React Router, Leaflet, React Leaflet, Axios, Custom Vanilla CSS.
 - **Backend**: Node.js, Express.js, JWT Authentication.
 - **Database**: MongoDB (Atlas) + Mongoose ODM.
 
@@ -17,17 +30,18 @@ CaféSpot/
 ├── backend/
 │   ├── config/            # DB Connection config
 │   ├── controllers/       # Route request handlers
-│   ├── middleware/        # JWT & Admin route guards
+│   ├── middleware/        # JWT & Admin/Owner route guards
 │   ├── models/            # Mongoose schemas (User, Cafe, Review, Favorite)
 │   ├── routes/            # REST API endpoints
 │   ├── utils/             # ratingCalculator aggregation pipeline
-│   ├── seed.js            # Sample café data populator
+│   ├── seed.js            # Mumbai sample café data populator (14 locations)
+│   ├── seedUsers.js       # Demo test account generator (visitor, owner, admin)
 │   └── server.js          # App entry point
 └── frontend/
     ├── src/
-    │   ├── components/    # Reusable glass UI elements
+    │   ├── components/    # Reusable UI elements (Navbar, CafeCard, SearchBar, etc.)
     │   ├── context/       # AuthContext for session management
-    │   ├── pages/         # Home, Cafes, CafeDetails, AddCafe, etc.
+    │   ├── pages/         # Home, Cafes, CafeDetails, MapView, OwnerDashboard, etc.
     │   ├── services/      # Axios API request modules
     │   ├── index.css      # Premium Glassmorphism CSS design system
     │   └── main.jsx       # Client entry
@@ -59,6 +73,9 @@ CaféSpot/
 - `POST /api/favorites/:cafeId` - Save a café spot.
 - `DELETE /api/favorites/:cafeId` - Unsave a café spot.
 
+### 📊 Owner Dashboard
+- `GET /api/users/owner-dashboard` - Retrieve owner stats, reviews trend, and portfolio (Owner/Admin only).
+
 ---
 
 ## ⚙️ Environment Variables (`.env`)
@@ -77,11 +94,12 @@ NODE_ENV=development
 ## 🛠️ Setup & Running Instructions
 
 ### 1. Database Seeding
-Populate MongoDB with 6 sample cafés:
+Populate MongoDB with 14 Mumbai cafés (Bandra, Juhu, Colaba, Lower Parel, Powai, etc.) and create the demo user accounts:
 ```bash
 cd backend
 npm install
 node seed.js
+node seedUsers.js
 ```
 
 ### 2. Start Backend Server
@@ -96,88 +114,50 @@ npm install
 npm run dev
 ```
 
-Visit the app at **[http://localhost:5173](http://localhost:5173)**.
+Visit the app at **[http://localhost:5173](http://localhost:5173)** (or `http://localhost:5174` if port 5173 is in use).
 
-## ✅ Tests
+---
 
-- Run backend integration tests (Jest + Supertest + in-memory MongoDB):
-```bash
-cd backend
-npm install
-npm test
-```
-
-## 🧑‍💼 Owner / Visitor Roles
-
-- This release introduces a three-tier role system: `visitor`, `owner`, and `admin`.
-- `visitor` is the default role and cannot create/edit/delete cafés.
-- `owner` can create cafés and manage only those they created.
-- `admin` has global privileges across the app.
-
-## 🧭 Commit Messages & Contribution
-
-We follow a concise, conventional-style commit format to keep history readable. Examples you can use for common frontend/backend changes:
-
-- Feature (new UI, pages, API):
-  - `feat(frontend): add BackgroundBlobs component and update App layout`
-  - `feat(backend): add owner-dashboard route and controller`
-
-- Bugfix / Behavior change:
-  - `fix(frontend): prevent double-submit on register form`
-  - `fix(backend): validate cafe payload priceRange`
-
-- Styling / non-functional changes:
-  - `style(frontend): tweak nav spacing and glass shadows`
-
-- Chore / housekeeping:
-  - `chore: add .gitignore and update README`
-  - `chore: remove implementation_plan(1)`
-
-To commit and push your current work:
-
-```bash
-cd "C:\Users\MANTHAN\OneDrive\Desktop\PROJECT\CaféSpot"
-git add .
-git commit -m "feat(frontend): add BackgroundBlobs component and update App/index.css; remove implementation_plan(1)"
-git push
-```
-
-If you prefer smaller commits, split the changes into logical commits (UI feature, styles, cleanup). Short, present-tense subject lines are best.
-
+## 🧑‍💼 User Roles & Permissions
+- **Visitor (Explorer)**: Default role. Can search, read reviews, add favorites, and write reviews.
+- **Owner**: Can list new cafés, manage their own listings, and view advanced analytics (rating breakdowns, monthly trends, aggregate portfolio metrics).
+- **Admin**: Global system privileges.
 
 ---
 
 ## 👥 Demo Credentials
-- **Admin / Demo Account**:
-  - **Email**: `seed@cafespot.dev`
-  - **Password**: `seedpass123`
+Run `node seedUsers.js` to initialize these accounts:
+
+| Role | Email | Password | Access |
+|------|-------|----------|--------|
+| **Explorer (Visitor)** | `explorer@cafespot.dev` | `explorer123` | Search, favorite, write reviews |
+| **Owner** | `owner@cafespot.dev` | `owner123` | Analytics, add/edit/delete own cafés |
+| **Admin** | `admin@cafespot.dev` | `admin123` | Full global access |
 
 ---
 
 ## 📚 Viva Questions & Answers
 
 ### Q1: What is Glassmorphism and how is it styled in CaféSpot?
-> **A**: Glassmorphism is a modern UI design trend focusing on transparency, multi-layered layouts, and blur effects. In CaféSpot, we implement this using CSS variables like `backdrop-filter: blur(12px)` combined with subtle white borders (`rgba(255, 255, 255, 0.08)`) and translucid shadows.
+> **A**: Glassmorphism focuses on transparency, multi-layered layouts, and blur effects. In CaféSpot, we implement this using CSS variables like `backdrop-filter: blur(12px)` combined with subtle white borders (`rgba(255, 255, 255, 0.08)`) and translucid shadows.
 
-### Q2: How are the Vibe Scores calculated without AI?
-> **A**: Mongoose virtuals are used. When a café document is loaded, we calculate scores on-the-fly from the stored rating categories:
+### Q2: How are the Vibe Scores calculated?
+> **A**: Mongoose virtuals are used. When a café document is retrieved, we calculate scores on-the-fly from the stored rating categories:
 > - **Study / Work Score**: `(Wi-Fi + Quietness + Ambience) / 3`
 > - **Date Score**: `(Ambience + Food + Quietness) / 3`
 > - **Coffee / Budget Score**: `(Coffee + Value) / 2`
 
-### Q3: How is MongoDB aggregation used to recalculate ratings?
-> **A**: Inside `utils/ratingCalculator.js`, we use `Review.aggregate()` with a `$match` stage for the café ID and a `$group` stage to find `$avg` values for all 6 rating fields and count `$sum: 1` reviews. We write the updated average scores back to the café document in a single round-trip.
+### Q3: How do we plot cafés on Leaflet without an API key?
+> **A**: We use Leaflet with OpenStreetMap tiles served by CartoDB (CartoDB Dark Matter). It provides a dark-mode base map completely free of charge, with no API key or token requirement.
 
-### Q4: How do you prevent a user from favoriting a café twice?
-> **A**: We apply two layers: a DB-level index constraints check `favoriteSchema.index({ user: 1, cafe: 1 }, { unique: true })`, and a controller-level query check `Favorite.findOne({ user, cafe })` before inserts.
+### Q4: How is the 6-month review trend chart rendered without Chart.js/recharts?
+> **A**: It is built using pure CSS and React. We bucket reviews by month, find the maximum count, and represent each month's count as a vertical bar using a percentage height (`height: (count / maxCount) * 100%`) within a flex container.
 
-### Q5: How do you handle JWT verification in Express?
-> **A**: Inside `middleware/authMiddleware.js`, the `protect` middleware reads the `Authorization` header (`Bearer <token>`), verifies the signature via `jwt.verify(token, JWT_SECRET)`, fetches the corresponding user from the database minus the password, and attaches it as `req.user` to pass down to downstream handlers.
+### Q5: How is MongoDB aggregation used to recalculate ratings?
+> **A**: Inside `utils/ratingCalculator.js`, we use `Review.aggregate()` with a `$match` stage for the café ID and a `$group` stage to find `$avg` values for all 6 rating fields and count `$sum: 1` reviews. We write the updated average scores back to the café document in a single database operation.
 
 ---
 
 ## 🎤 Project Presentation Points
-1. **Design First approach**: Impress viewers with curated coffee themes, glass elements, transitions, and layout cards.
-2. **Precision Scoring**: Users don't just rate 1-5 stars overall. They rate 6 pillars, yielding custom vibe recommendations (Study, Work, Date, etc.).
 3. **Database Performance**: All ratings are recalculated via MongoDB Aggregation Pipelines in a single database roundtrip on change.
 4. **Clean Session Guards**: JWT credentials persist in localStorage, providing smooth auth-guards and redirects.

@@ -123,14 +123,4 @@ Visit the app at **[http://localhost:5173](http://localhost:5173)** (or `http://
 - **Owner**: Can list new cafés, manage their own listings, and view advanced analytics (rating breakdowns, monthly trends, aggregate portfolio metrics).
 - **Admin**: Global system privileges.
 
----
-
-## 👥 Demo Credentials
-Run `node seedUsers.js` to initialize these accounts:
-
-| Role | Email | Password | Access |
-|------|-------|----------|--------|
-| **Explorer (Visitor)** | `explorer@cafespot.dev` | `explorer123` | Search, favorite, write reviews |
-| **Owner** | `owner@cafespot.dev` | `owner123` | Analytics, add/edit/delete own cafés |
-| **Admin** | `admin@cafespot.dev` | `admin123` | Full global access |
 

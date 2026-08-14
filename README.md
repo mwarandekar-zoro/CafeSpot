@@ -136,28 +136,9 @@ Run `node seedUsers.js` to initialize these accounts:
 
 ---
 
-## 📚 Viva Questions & Answers
-
-### Q1: What is Glassmorphism and how is it styled in CaféSpot?
-> **A**: Glassmorphism focuses on transparency, multi-layered layouts, and blur effects. In CaféSpot, we implement this using CSS variables like `backdrop-filter: blur(12px)` combined with subtle white borders (`rgba(255, 255, 255, 0.08)`) and translucid shadows.
-
-### Q2: How are the Vibe Scores calculated?
-> **A**: Mongoose virtuals are used. When a café document is retrieved, we calculate scores on-the-fly from the stored rating categories:
-> - **Study / Work Score**: `(Wi-Fi + Quietness + Ambience) / 3`
-> - **Date Score**: `(Ambience + Food + Quietness) / 3`
-> - **Coffee / Budget Score**: `(Coffee + Value) / 2`
-
-### Q3: How do we plot cafés on Leaflet without an API key?
-> **A**: We use Leaflet with OpenStreetMap tiles served by CartoDB (CartoDB Dark Matter). It provides a dark-mode base map completely free of charge, with no API key or token requirement.
-
-### Q4: How is the 6-month review trend chart rendered without Chart.js/recharts?
-> **A**: It is built using pure CSS and React. We bucket reviews by month, find the maximum count, and represent each month's count as a vertical bar using a percentage height (`height: (count / maxCount) * 100%`) within a flex container.
-
-### Q5: How is MongoDB aggregation used to recalculate ratings?
-> **A**: Inside `utils/ratingCalculator.js`, we use `Review.aggregate()` with a `$match` stage for the café ID and a `$group` stage to find `$avg` values for all 6 rating fields and count `$sum: 1` reviews. We write the updated average scores back to the café document in a single database operation.
-
----
-
 ## 🎤 Project Presentation Points
+1. **Interactive Dark Map**: Present the split-panel MapView showcasing CartoDB Dark Matter tiles, custom category SVG pins, and real-time live filtering.
+2. **Expandable Analytics**: Demonstrate the Owner Dashboard's score progress bars and the 6-month review volume trend chart built purely in CSS.
 3. **Database Performance**: All ratings are recalculated via MongoDB Aggregation Pipelines in a single database roundtrip on change.
 4. **Clean Session Guards**: JWT credentials persist in localStorage, providing smooth auth-guards and redirects.
+

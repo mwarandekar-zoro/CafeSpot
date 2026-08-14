@@ -83,121 +83,112 @@ export default function Home() {
       {/* Hero Section */}
       <section style={{
         position: "relative",
-        height: "75vh",
-        minHeight: "500px",
-        background: "linear-gradient(rgba(10,10,12,0.8), rgba(10,10,12,0.9)), url('https://images.unsplash.com/photo-1498804103079-a6351b050096?w=1600') center/cover no-repeat",
+        height: "85vh",
+        minHeight: "600px",
+        background: "linear-gradient(rgba(10,10,12,0.8), rgba(10,10,12,0.95)), url('https://images.unsplash.com/photo-1498804103079-a6351b050096?w=1600') center/cover no-repeat",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
         padding: "0 20px"
       }}>
-        <div style={{ maxWidth: "800px", display: "flex", flexDirection: "column", gap: "24px", alignItems: "center" }}>
+        <div style={{ maxWidth: "800px", display: "flex", flexDirection: "column", gap: "28px", alignItems: "center" }}>
+          {/* Main Hero Header */}
           <h1 style={{
             fontFamily: "var(--font-serif)",
-            fontSize: "clamp(2.5rem, 5vw, 4rem)",
+            fontSize: "clamp(2.8rem, 6vw, 4.5rem)",
             fontWeight: 700,
             lineHeight: 1.1,
-            color: "var(--text-primary)"
+            color: "var(--text-primary)",
+            letterSpacing: "0.02em"
           }}>
-            FIND YOUR <span className="text-accent">PERFECT SPOT.</span>
+            FIND YOUR<br />
+            <span className="text-accent">PERFECT SPOT.</span>
           </h1>
+
+          {/* Subtitle */}
           <p style={{
-            fontSize: "clamp(1rem, 2vw, 1.2rem)",
+            fontSize: "clamp(1.1rem, 2vw, 1.4rem)",
             color: "var(--text-secondary)",
-            maxWidth: "600px"
+            maxWidth: "600px",
+            lineHeight: "1.5",
+            fontWeight: "500"
           }}>
-            Discover and book local cafés based on your specific vibe: work, study, romantic dates, or a budget chill.
+            Not just a café.<br />
+            <span style={{ color: "var(--text-primary)", fontWeight: "600" }}>Your kind of café.</span>
           </p>
 
-          <div style={{ width: "100%", maxWidth: "600px", marginTop: "16px" }}>
+          {/* Search Bar Container */}
+          <div style={{ width: "100%", maxWidth: "600px", marginTop: "8px" }}>
             <SearchBar 
               value={searchVal} 
               onChange={setSearchVal} 
               onSearch={handleSearchSubmit} 
-              placeholder="Search cafe name, location, keyword..." 
+              placeholder="Search cafés, locations, vibes..." 
             />
           </div>
 
-
-          <div style={{ display: "flex", gap: "12px", marginTop: "8px", flexWrap: "wrap", justifyContent: "center" }}>
-            <Link
-              to="/cafes"
-              className="btn btn-primary"
-              style={{ fontSize: "0.9rem", padding: "11px 28px", fontWeight: "700" }}
-            >
-              ☕ Explore Cafés
-            </Link>
-            <Link
-              to="/map"
-              className="btn btn-ghost"
-              style={{
-                fontSize: "0.9rem", padding: "11px 28px", fontWeight: "700",
-                borderColor: "var(--glass-border-strong)",
-              }}
-            >
-              🗺 View on Map
-            </Link>
+          {/* Vibe Chips inside Hero */}
+          <div style={{ 
+            display: "flex", 
+            flexWrap: "wrap", 
+            gap: "10px", 
+            justifyContent: "center", 
+            maxWidth: "600px", 
+            marginTop: "8px" 
+          }}>
+            {categories.map((cat) => (
+              <button
+                key={cat.name}
+                onClick={() => handleCategoryClick(cat.name)}
+                className="btn btn-ghost"
+                style={{
+                  borderRadius: "var(--radius-full)",
+                  padding: "8px 18px",
+                  fontSize: "0.88rem",
+                  background: "rgba(255, 255, 255, 0.03)",
+                  borderColor: "var(--glass-border)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  transition: "all var(--transition)"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.borderColor = "var(--accent)";
+                  e.currentTarget.style.background = "var(--accent-dim)";
+                  e.currentTarget.style.boxShadow = "var(--shadow-glow)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.borderColor = "var(--glass-border)";
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.03)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              >
+                <span>{cat.icon}</span>
+                <span style={{ fontWeight: "600", color: "var(--text-primary)" }}>{cat.name}</span>
+              </button>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Categories Vibe Section */}
+      {/* Trending Spots Section (Immediately below Hero) */}
       <section className="container">
-        <div style={{ textAlign: "center", marginBottom: "40px" }}>
-          <h2 className="section-title">Discover Cafés By <span className="text-accent">Vibe</span></h2>
-          <p className="section-subtitle">What's your mood today? Pick a style and start exploring.</p>
-        </div>
-
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-          gap: "20px"
-        }}>
-          {categories.map((cat) => (
-            <div
-              key={cat.name}
-              className="glass"
-              onClick={() => handleCategoryClick(cat.name)}
-              style={{
-                padding: "32px 20px",
-                textAlign: "center",
-                cursor: "pointer",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "12px",
-                transition: "all var(--transition)"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-4px)";
-                e.currentTarget.style.borderColor = "var(--accent)";
-                e.currentTarget.style.boxShadow = "var(--shadow-glow)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.borderColor = "var(--glass-border)";
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              <span style={{ fontSize: "2.5rem" }}>{cat.icon}</span>
-              <h3 style={{ fontSize: "1.1rem", fontWeight: "600" }}>{cat.name}</h3>
-              <p style={{ fontSize: "0.78rem", color: "var(--text-secondary)" }}>{cat.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Top Rated Section */}
-      <section className="container">
-        <div className="section-header">
+        <div className="section-header" style={{ marginBottom: "32px" }}>
           <div>
-            <h2 className="section-title">Top Rated <span className="text-accent">Spots</span></h2>
-            <p className="section-subtitle">Highly recommended based on user ratings</p>
+            <h2 className="section-title">TRENDING SPOTS <span className="text-accent">NEAR YOU</span></h2>
+            <p className="section-subtitle">Highly recommended spots in Mumbai based on user ratings & vibes</p>
           </div>
-          <Link to="/cafes?sort=rating" className="btn btn-ghost btn-sm text-accent">
-            View All
-          </Link>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <Link to="/map" className="btn btn-ghost btn-sm text-accent" style={{ borderColor: "var(--glass-border-strong)" }}>
+              🗺 View Map
+            </Link>
+            <Link to="/cafes?sort=rating" className="btn btn-ghost btn-sm text-accent" style={{ borderColor: "var(--glass-border-strong)" }}>
+              View All
+            </Link>
+          </div>
         </div>
 
         {loading ? (
@@ -241,6 +232,7 @@ export default function Home() {
           ))}
         </div>
       </section>
+
     </div>
   );
 }

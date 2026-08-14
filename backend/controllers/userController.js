@@ -128,39 +128,68 @@ const getMyFavorites = async (req, res) => {
 const getOwnerDashboard = async (req, res) => {
   try {
     const cafes = await Cafe.find({ createdBy: req.user._id });
-    
+
     const cafesWithStats = await Promise.all(
       cafes.map(async (cafe) => {
-        const reviews = await Review.find({ cafe: cafe._id })
+        // Fetch ALL reviews for trend + breakdown (no limit)
+        const allReviews = await Review.find({ cafe: cafe._id })
           .populate("user", "name profileImage")
-          .sort({ createdAt: -1 })
-          .limit(5);
+          .sort({ createdAt: -1 });
+
+        // 5 most recent for the feed
+        const recentReviews = allReviews.slice(0, 5);
+
+        // Monthly trend: count reviews per YYYY-MM bucket
+        const trendMap = {};
+        allReviews.forEach((r) => {
+          const key = r.createdAt.toISOString().slice(0, 7); // "2024-03"
+          trendMap[key] = (trendMap[key] || 0) + 1;
+        });
+
+        // Build last 6 months array (including months with 0 reviews)
+        const trend = [];
+        for (let i = 5; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(1);
+          d.setMonth(d.getMonth() - i);
+          const key = d.toISOString().slice(0, 7);
+          trend.push({ month: key, count: trendMap[key] || 0 });
+        }
 
         return {
           ...cafe.toObject({ virtuals: true }),
-          recentReviews: reviews
+          recentReviews,
+          allReviewCount: allReviews.length,
+          trend,
         };
       })
     );
 
-    const totalCafes = cafes.length;
+    const totalCafes   = cafes.length;
     const totalReviews = cafes.reduce((sum, c) => sum + (c.reviewCount || 0), 0);
-    const avgRating = totalCafes > 0 
+    const avgRating    = totalCafes > 0
       ? Math.round((cafes.reduce((sum, c) => sum + (c.averageRating || 0), 0) / totalCafes) * 10) / 10
       : 0;
+
+    // Best-performing cafe (highest averageRating)
+    const bestCafe = cafes.length > 0
+      ? cafes.reduce((best, c) => (c.averageRating > (best?.averageRating || 0) ? c : best), null)
+      : null;
 
     res.status(200).json({
       success: true,
       stats: {
         totalCafes,
         totalReviews,
-        averageRating: avgRating
+        averageRating: avgRating,
+        bestCafeId: bestCafe?._id || null,
       },
-      cafes: cafesWithStats
+      cafes: cafesWithStats,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 module.exports = { getProfile, updateProfile, getMyReviews, getMyCafes, getMyFavorites, getOwnerDashboard };

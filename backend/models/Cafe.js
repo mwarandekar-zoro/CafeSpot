@@ -43,6 +43,10 @@ const cafeSchema = new mongoose.Schema(
       trim: true,
     },
 
+    // Geographic coordinates for map plotting
+    lat: { type: Number },
+    lng: { type: Number },
+
     category: {
       type: String,
       enum: ["Coffee", "Study", "Work", "Date", "Chill", "Budget"],

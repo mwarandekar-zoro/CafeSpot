@@ -11,6 +11,7 @@ export default function Home() {
   const [topCafes, setTopCafes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchVal, setSearchVal] = useState("");
 
   const categories = [
     { name: "Coffee", icon: "☕", desc: "For caffeine lovers" },
@@ -67,8 +68,9 @@ export default function Home() {
   }, []);
 
   const handleSearchSubmit = (searchTerm) => {
-    if (searchTerm.trim()) {
-      navigate(`/cafes?search=${encodeURIComponent(searchTerm)}`);
+    const term = typeof searchTerm === "string" ? searchTerm : searchVal;
+    if (term.trim()) {
+      navigate(`/cafes?search=${encodeURIComponent(term)}`);
     }
   };
 
@@ -109,7 +111,33 @@ export default function Home() {
           </p>
 
           <div style={{ width: "100%", maxWidth: "600px", marginTop: "16px" }}>
-            <SearchBar onChange={handleSearchSubmit} placeholder="Search cafe name, location, keyword..." />
+            <SearchBar 
+              value={searchVal} 
+              onChange={setSearchVal} 
+              onSearch={handleSearchSubmit} 
+              placeholder="Search cafe name, location, keyword..." 
+            />
+          </div>
+
+
+          <div style={{ display: "flex", gap: "12px", marginTop: "8px", flexWrap: "wrap", justifyContent: "center" }}>
+            <Link
+              to="/cafes"
+              className="btn btn-primary"
+              style={{ fontSize: "0.9rem", padding: "11px 28px", fontWeight: "700" }}
+            >
+              ☕ Explore Cafés
+            </Link>
+            <Link
+              to="/map"
+              className="btn btn-ghost"
+              style={{
+                fontSize: "0.9rem", padding: "11px 28px", fontWeight: "700",
+                borderColor: "var(--glass-border-strong)",
+              }}
+            >
+              🗺 View on Map
+            </Link>
           </div>
         </div>
       </section>

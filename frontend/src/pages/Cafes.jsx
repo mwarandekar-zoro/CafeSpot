@@ -29,10 +29,12 @@ export default function Cafes() {
   const category = searchParams.get("category") || "";
   const price = searchParams.get("price") || "";
   const minRating = searchParams.get("minRating") || "";
+  const vibe = searchParams.get("vibe") || "";
+  const minVibeScore = searchParams.get("minVibeScore") || "";
   const sort = searchParams.get("sort") || "newest";
   const page = parseInt(searchParams.get("page") || "1");
 
-  const currentFilters = { search, category, price, minRating, sort, page };
+  const currentFilters = { search, category, price, minRating, vibe, minVibeScore, sort, page };
 
   // Fetch favorites if user is authenticated
   const fetchFavorites = useCallback(async () => {
@@ -66,6 +68,8 @@ export default function Cafes() {
       if (category) apiParams.category = category;
       if (price) apiParams.price = price;
       if (minRating) apiParams.minRating = minRating;
+      if (vibe) apiParams.vibe = vibe;
+      if (vibe && minVibeScore) apiParams.minVibeScore = minVibeScore;
 
       const data = await cafeService.getCafes(apiParams);
       if (data.success) {
@@ -78,7 +82,7 @@ export default function Cafes() {
     } finally {
       setLoading(false);
     }
-  }, [page, sort, search, category, price, minRating]);
+  }, [page, sort, search, category, price, minRating, vibe, minVibeScore]);
 
   useEffect(() => {
     fetchCafes();
@@ -151,7 +155,26 @@ export default function Cafes() {
     <div className="container fade-in" style={{ padding: "40px 0 64px 0" }}>
       {/* Header */}
       <div style={{ marginBottom: "32px", display: "flex", flexDirection: "column", gap: "16px" }}>
-        <h1 className="section-title">Explore All <span className="text-accent">Cafés</span></h1>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+          <h1 className="section-title">Explore All <span className="text-accent">Cafés</span></h1>
+          <button
+            onClick={() => {
+              const params = new URLSearchParams();
+              if (search) params.set("search", search);
+              if (category) params.set("category", category);
+              navigate(`/map?${params.toString()}`);
+            }}
+            className="btn btn-ghost btn-sm"
+            style={{
+              borderColor: "var(--glass-border-strong)",
+              display: "flex", alignItems: "center", gap: "6px",
+              fontWeight: "700", letterSpacing: "0.03em",
+              flexShrink: 0,
+            }}
+          >
+            🗺 Map View
+          </button>
+        </div>
         <div style={{ maxWidth: "700px" }}>
           <SearchBar value={search} onChange={handleSearchChange} placeholder="Search cafe by name, city, vibe tags..." />
         </div>

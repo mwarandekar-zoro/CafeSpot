@@ -56,7 +56,7 @@ export default function CafeCard({
           <h4 style={{ fontFamily: "var(--font-serif)", fontSize: "1.15rem", fontWeight: "600", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
             {name}
           </h4>
-          <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "var(--text-secondary)" }}>{priceRange}</span>
+          <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "var(--text-secondary)", letterSpacing: 0 }}>{priceRange}</span>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.85rem", color: "var(--text-secondary)" }}>

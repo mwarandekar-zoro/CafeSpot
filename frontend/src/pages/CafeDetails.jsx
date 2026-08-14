@@ -7,6 +7,7 @@ import ErrorMessage from "../components/ErrorMessage";
 import Rating from "../components/Rating";
 import VibeScore from "../components/VibeScore";
 import ReviewCard from "../components/ReviewCard";
+import CafeCard from "../components/CafeCard";
 
 function RatingSelector({ label, value, onChange }) {
   return (
@@ -47,6 +48,8 @@ export default function CafeDetails() {
   const [loading, setLoading] = useState(true);
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [similarCafes, setSimilarCafes] = useState([]);
+  const [similarLoading, setSimilarLoading] = useState(true);
 
   // Review form states
   const [comment, setComment] = useState("");
@@ -91,10 +94,25 @@ export default function CafeDetails() {
     }
   }, [cafeId]);
 
+  const fetchSimilarCafes = useCallback(async () => {
+    try {
+      setSimilarLoading(true);
+      const data = await cafeService.getSimilarCafes(cafeId, 4);
+      if (data.success) {
+        setSimilarCafes(data.cafes);
+      }
+    } catch (err) {
+      console.error("Failed to load similar cafes:", err);
+    } finally {
+      setSimilarLoading(false);
+    }
+  }, [cafeId]);
+
   useEffect(() => {
     fetchCafeDetails();
     fetchCafeReviews();
-  }, [fetchCafeDetails, fetchCafeReviews]);
+    fetchSimilarCafes();
+  }, [fetchCafeDetails, fetchCafeReviews, fetchSimilarCafes]);
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
@@ -260,7 +278,7 @@ export default function CafeDetails() {
           <div className="glass" style={{ padding: "32px" }}>
             <div className="flex-between" style={{ flexWrap: "wrap", gap: "12px" }}>
               <h1 style={{ fontFamily: "var(--font-serif)", fontSize: "2.5rem", fontWeight: "700" }}>{cafe.name}</h1>
-              <span style={{ fontSize: "1.25rem", fontWeight: "700", color: "var(--text-secondary)" }}>{cafe.priceRange}</span>
+              <span style={{ fontSize: "1.25rem", fontWeight: "700", color: "var(--text-secondary)", letterSpacing: 0 }}>{cafe.priceRange}</span>
             </div>
             <p style={{ color: "var(--text-secondary)", marginTop: "8px", fontSize: "0.95rem" }}>
               📍 {cafe.location} • {cafe.address}
@@ -398,6 +416,31 @@ export default function CafeDetails() {
               </div>
             )}
           </div>
+
+          {/* Similar Cafes — vibe-score based recommendations */}
+          {(similarLoading || similarCafes.length > 0) && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "1.5rem" }}>
+                You Might Also <span className="text-accent">Like</span>
+              </h2>
+              {similarLoading ? (
+                <Loading message="Finding similar vibes..." />
+              ) : (
+                <div className="cafe-grid">
+                  {similarCafes.map((sc) => (
+                    <div key={sc._id} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                      <CafeCard cafe={sc} />
+                      {typeof sc.similarityScore === "number" && (
+                        <span style={{ fontSize: "0.8rem", color: "var(--accent-light)", fontWeight: "600", textAlign: "center" }}>
+                          {sc.similarityScore}% vibe match
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

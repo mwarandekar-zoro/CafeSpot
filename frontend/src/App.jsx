@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import OwnerDashboard from "./pages/OwnerDashboard";
+import MapView from "./pages/MapView";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import BackgroundBlobs from "./components/BackgroundBlobs";
@@ -44,6 +45,7 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/cafes" element={<Cafes />} />
           <Route path="/cafes/:id" element={<CafeDetails />} />
+          <Route path="/map" element={<MapView />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 

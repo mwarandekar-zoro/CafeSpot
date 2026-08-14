@@ -37,4 +37,8 @@ export const cafeService = {
     const { data } = await api.delete(`/reviews/${reviewId}`);
     return data;
   },
+  getSimilarCafes: async (id, limit = 4) => {
+    const { data } = await api.get(`/cafes/${id}/similar`, { params: { limit } });
+    return data; // { success, cafes: [{ ...cafe, similarityScore }] }
+  },
 };

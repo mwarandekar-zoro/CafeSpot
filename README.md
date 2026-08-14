@@ -134,11 +134,3 @@ Run `node seedUsers.js` to initialize these accounts:
 | **Owner** | `owner@cafespot.dev` | `owner123` | Analytics, add/edit/delete own cafés |
 | **Admin** | `admin@cafespot.dev` | `admin123` | Full global access |
 
----
-
-## 🎤 Project Presentation Points
-1. **Interactive Dark Map**: Present the split-panel MapView showcasing CartoDB Dark Matter tiles, custom category SVG pins, and real-time live filtering.
-2. **Expandable Analytics**: Demonstrate the Owner Dashboard's score progress bars and the 6-month review volume trend chart built purely in CSS.
-3. **Database Performance**: All ratings are recalculated via MongoDB Aggregation Pipelines in a single database roundtrip on change.
-4. **Clean Session Guards**: JWT credentials persist in localStorage, providing smooth auth-guards and redirects.
-

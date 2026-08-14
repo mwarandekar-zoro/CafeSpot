@@ -11,29 +11,29 @@
  */
 
 const mongoose = require("mongoose");
-const dotenv   = require("dotenv");
+const dotenv = require("dotenv");
 dotenv.config();
 
 const User = require("./models/User");
 
 const testUsers = [
   {
-    name:     "Alex Explorer",
-    email:    "explorer@cafespot.dev",
+    name: "Alex Explorer",
+    email: "explorer@cafespot.dev",
     password: "explorer123",
-    role:     "visitor",
+    role: "visitor",
   },
   {
-    name:     "Maya Owner",
-    email:    "owner@cafespot.dev",
+    name: "Maya Owner",
+    email: "owner@cafespot.dev",
     password: "owner123",
-    role:     "owner",
+    role: "owner",
   },
   {
-    name:     "CaféSpot Admin",
-    email:    "admin@cafespot.dev",
+    name: "CaféSpot Admin",
+    email: "admin@cafespot.dev",
     password: "admin123",
-    role:     "admin",
+    role: "admin",
   },
 ];
 

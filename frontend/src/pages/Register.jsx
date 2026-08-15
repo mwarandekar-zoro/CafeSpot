@@ -87,7 +87,39 @@ export default function Register() {
               </p>
             </div>
 
-            {/* Card 2: Admin */}
+            {/* Card 2: Owner */}
+            <div className="glass" 
+                 onClick={() => setSelectedRole("owner")}
+                 style={{
+                   padding: "48px 32px",
+                   flex: "1 1 240px",
+                   maxWidth: "280px",
+                   cursor: "pointer",
+                   textAlign: "center",
+                   display: "flex",
+                   flexDirection: "column",
+                   alignItems: "center",
+                   gap: "16px",
+                   transition: "all var(--transition)"
+                 }}
+                 onMouseEnter={(e) => {
+                   e.currentTarget.style.transform = "translateY(-4px)";
+                   e.currentTarget.style.borderColor = "var(--accent)";
+                   e.currentTarget.style.boxShadow = "var(--shadow-glow)";
+                 }}
+                 onMouseLeave={(e) => {
+                   e.currentTarget.style.transform = "translateY(0)";
+                   e.currentTarget.style.borderColor = "var(--glass-border)";
+                   e.currentTarget.style.boxShadow = "none";
+                 }}>
+              <span style={{ fontSize: "3.5rem" }}>🏪</span>
+              <h3 style={{ fontSize: "1.3rem", fontWeight: "700" }}>Café Owner</h3>
+              <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: "1.5" }}>
+                List and manage your own cafés, view review summaries, and stats.
+              </p>
+            </div>
+
+            {/* Card 3: Admin */}
             <div className="glass" 
                  onClick={() => setSelectedRole("admin")}
                  style={{
@@ -112,7 +144,7 @@ export default function Register() {
                    e.currentTarget.style.borderColor = "var(--glass-border)";
                    e.currentTarget.style.boxShadow = "none";
                  }}>
-              <span style={{ fontSize: "3.5rem" }}>🏪</span>
+              <span style={{ fontSize: "3.5rem" }}>🛡️</span>
               <h3 style={{ fontSize: "1.3rem", fontWeight: "700" }}>Administrator</h3>
               <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: "1.5" }}>
                 List and manage all cafés, view portfolio metrics, and performance stats.
@@ -152,8 +184,9 @@ export default function Register() {
         <div style={{ textAlign: "center" }}>
           <span style={{ fontSize: "2.5rem" }}>☕</span>
           <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "1.6rem", marginTop: "12px" }}>
-            Sign Up as {selectedRole === "admin" ? "Administrator" : "Café Explorer"}
+            Sign Up as {selectedRole === "admin" ? "Administrator" : selectedRole === "owner" ? "Café Owner" : "Café Explorer"}
           </h2>
+
 
           <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "4px" }}>
             Join CaféSpot to save your favorite vibes and add ratings.

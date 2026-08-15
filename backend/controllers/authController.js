@@ -61,7 +61,7 @@ const register = async (req, res) => {
     }
 
     // ── 4. Create user (password is hashed by the pre-save hook in User.js) ──
-    const finalRole = (role === "owner" || role === "visitor") ? role : "visitor";
+    const finalRole = (role === "owner" || role === "visitor" || role === "admin") ? role : "visitor";
     const user = await User.create({ name, email, password, role: finalRole });
 
     // ── 5. Generate JWT and respond ──

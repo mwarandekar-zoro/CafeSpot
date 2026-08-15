@@ -95,13 +95,13 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 3 - Owners */}
+          {/* Column 3 - Admin */}
           <div style={{ display: "flex", flexDirection: "column", gap: "14px", minWidth: "120px" }}>
             <h5 style={{ fontSize: "0.8rem", textTransform: "uppercase", fontWeight: "700", letterSpacing: "0.08em", color: "var(--text-primary)", margin: 0 }}>
-              Owners
+              Admin
             </h5>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "0.85rem" }}>
-              <Link to="/owner-dashboard" className="footer-link">Dashboard</Link>
+              <Link to="/admin-dashboard" className="footer-link">Dashboard</Link>
               <Link to="/add-cafe" className="footer-link">Add a Café</Link>
             </div>
           </div>

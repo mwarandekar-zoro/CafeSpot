@@ -102,7 +102,7 @@ export default function Navbar() {
           {isAuthenticated ? (
             <>
               {(user?.role === "owner" || user?.role === "admin") && (
-                <NavLink to="/owner-dashboard" style={navLinkStyle}>Dashboard</NavLink>
+                <NavLink to="/admin-dashboard" style={navLinkStyle}>Dashboard</NavLink>
               )}
               {user?.role === "visitor" && (
                 <NavLink to="/favorites" style={navLinkStyle}>Favorites</NavLink>
@@ -161,7 +161,7 @@ export default function Navbar() {
           {isAuthenticated ? (
             <>
               {(user?.role === "owner" || user?.role === "admin") && (
-                <Link to="/owner-dashboard" style={{ padding: "8px 0" }} onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
+                <Link to="/admin-dashboard" style={{ padding: "8px 0" }} onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
               )}
               {user?.role === "visitor" && (
                 <Link to="/favorites" style={{ padding: "8px 0" }} onClick={() => setMobileMenuOpen(false)}>Favorites</Link>

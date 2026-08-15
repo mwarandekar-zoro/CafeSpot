@@ -55,7 +55,7 @@ function AppContent() {
               <AddCafe />
             </ProtectedRoute>
           } />
-          <Route path="/owner-dashboard" element={
+          <Route path="/admin-dashboard" element={
             <ProtectedRoute allowedRoles={["owner", "admin"]}>
               <OwnerDashboard />
             </ProtectedRoute>

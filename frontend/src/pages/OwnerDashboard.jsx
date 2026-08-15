@@ -309,7 +309,7 @@ export default function OwnerDashboard() {
     }
   };
 
-  if (loading) return <Loading message="Opening owner dashboard..." />;
+  if (loading) return <Loading message="Opening admin dashboard..." />;
   if (error)   return <ErrorMessage message={error} onRetry={fetchDashboardData} />;
 
   // Flatten + sort recent reviews from all cafes
@@ -328,7 +328,7 @@ export default function OwnerDashboard() {
       <div className="flex-between" style={{ flexWrap: "wrap", gap: "16px", marginBottom: "40px" }}>
         <div>
           <h1 className="section-title">
-            Café Owner <span className="text-accent">Dashboard</span>
+            Admin <span className="text-accent">Dashboard</span>
           </h1>
           <p className="section-subtitle">
             Manage listings, view customer ratings, and track performance analytics.

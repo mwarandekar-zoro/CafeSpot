@@ -87,9 +87,9 @@ export default function Register() {
               </p>
             </div>
 
-            {/* Card 2: Owner */}
+            {/* Card 2: Admin */}
             <div className="glass" 
-                 onClick={() => setSelectedRole("owner")}
+                 onClick={() => setSelectedRole("admin")}
                  style={{
                    padding: "48px 32px",
                    flex: "1 1 240px",
@@ -113,9 +113,9 @@ export default function Register() {
                    e.currentTarget.style.boxShadow = "none";
                  }}>
               <span style={{ fontSize: "3.5rem" }}>🏪</span>
-              <h3 style={{ fontSize: "1.3rem", fontWeight: "700" }}>Café Owner</h3>
+              <h3 style={{ fontSize: "1.3rem", fontWeight: "700" }}>Administrator</h3>
               <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: "1.5" }}>
-                List and manage your cafés, view review summaries, and stats.
+                List and manage all cafés, view portfolio metrics, and performance stats.
               </p>
             </div>
           </div>
@@ -152,8 +152,9 @@ export default function Register() {
         <div style={{ textAlign: "center" }}>
           <span style={{ fontSize: "2.5rem" }}>☕</span>
           <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "1.6rem", marginTop: "12px" }}>
-            Sign Up as {selectedRole === "owner" ? "Café Owner" : "Café Explorer"}
+            Sign Up as {selectedRole === "admin" ? "Administrator" : "Café Explorer"}
           </h2>
+
           <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "4px" }}>
             Join CaféSpot to save your favorite vibes and add ratings.
           </p>

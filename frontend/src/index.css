@@ -974,3 +974,38 @@ a:focus-visible {
   }
 }
 
+/* ── Floating Cafe Elements Animations ────────────────────────────── */
+@keyframes float-y-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(8deg); }
+}
+
+@keyframes float-y-slower {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-30px) rotate(-12deg); }
+}
+
+@keyframes float-y-fast {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(15deg); }
+}
+
+.floating-cafe-element {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.28;
+  transition: opacity 0.5s ease;
+  will-change: transform;
+}
+
+.floating-cafe-element:hover {
+  opacity: 0.6 !important;
+}
+
+/* Hide floating elements on smaller tablet/mobile viewports to avoid layout clutter */
+@media (max-width: 1024px) {
+  .floating-cafe-bg-container {
+    display: none !important;
+  }
+}

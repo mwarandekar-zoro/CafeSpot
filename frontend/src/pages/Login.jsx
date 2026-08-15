@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import FloatingCafeBackground from "../components/FloatingCafeBackground";
 
 export default function Login() {
   const { login, isAuthenticated } = useAuth();
@@ -42,7 +43,8 @@ export default function Login() {
 
   if (!selectedRole) {
     return (
-      <div className="flex-center page-content container fade-in" style={{ paddingBottom: "64px" }}>
+      <div className="flex-center page-content container fade-in" style={{ paddingBottom: "64px", position: "relative" }}>
+        <FloatingCafeBackground />
         <div style={{ maxWidth: "960px", textAlign: "center", display: "flex", flexDirection: "column", gap: "24px", alignItems: "center" }}>
           <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "2.2rem" }}>Choose Your Entrance Vibe</h2>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", maxWidth: "480px" }}>
@@ -152,7 +154,8 @@ export default function Login() {
   }
 
   return (
-    <div className="flex-center page-content container fade-in" style={{ paddingBottom: "64px" }}>
+    <div className="flex-center page-content container fade-in" style={{ paddingBottom: "64px", position: "relative" }}>
+      <FloatingCafeBackground />
       <div className="glass-md" style={{
         width: "100%",
         maxWidth: "420px",

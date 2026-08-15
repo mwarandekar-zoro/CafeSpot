@@ -101,8 +101,11 @@ export default function Navbar() {
           <NavLink to="/map" style={navLinkStyle}>🗺 Map</NavLink>
           {isAuthenticated ? (
             <>
-              {(user?.role === "owner" || user?.role === "admin") && (
+              {user?.role === "admin" && (
                 <NavLink to="/admin-dashboard" style={navLinkStyle}>Dashboard</NavLink>
+              )}
+              {user?.role === "owner" && (
+                <NavLink to="/owner-dashboard" style={navLinkStyle}>Dashboard</NavLink>
               )}
               {user?.role === "visitor" && (
                 <NavLink to="/favorites" style={navLinkStyle}>Favorites</NavLink>
@@ -160,8 +163,11 @@ export default function Navbar() {
           <Link to="/map" style={{ padding: "8px 0" }} onClick={() => setMobileMenuOpen(false)}>🗺 Map</Link>
           {isAuthenticated ? (
             <>
-              {(user?.role === "owner" || user?.role === "admin") && (
+              {user?.role === "admin" && (
                 <Link to="/admin-dashboard" style={{ padding: "8px 0" }} onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
+              )}
+              {user?.role === "owner" && (
+                <Link to="/owner-dashboard" style={{ padding: "8px 0" }} onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
               )}
               {user?.role === "visitor" && (
                 <Link to="/favorites" style={{ padding: "8px 0" }} onClick={() => setMobileMenuOpen(false)}>Favorites</Link>

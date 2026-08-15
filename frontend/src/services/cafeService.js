@@ -41,4 +41,12 @@ export const cafeService = {
     const { data } = await api.get(`/cafes/${id}/similar`, { params: { limit } });
     return data; // { success, cafes: [{ ...cafe, similarityScore }] }
   },
+  bulkUpdateCafes: async (bulkData) => {
+    const { data } = await api.put("/cafes/bulk-update", bulkData);
+    return data;
+  },
+  getRecommendations: async () => {
+    const { data } = await api.get("/cafes/recommendations");
+    return data;
+  },
 };

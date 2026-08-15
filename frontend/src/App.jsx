@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import OwnerDashboard from "./pages/OwnerDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import MapView from "./pages/MapView";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -59,7 +60,12 @@ function AppContent() {
             </ProtectedRoute>
           } />
           <Route path="/admin-dashboard" element={
-            <ProtectedRoute allowedRoles={["owner", "admin"]}>
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/owner-dashboard" element={
+            <ProtectedRoute allowedRoles={["owner"]}>
               <OwnerDashboard />
             </ProtectedRoute>
           } />

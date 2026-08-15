@@ -6,6 +6,8 @@ const {
   createCafe,
   updateCafe,
   deleteCafe,
+  bulkUpdateCafes,
+  getRecommendations,
 } = require("../controllers/cafeController");
 
 const {
@@ -13,11 +15,19 @@ const {
   addReview,
 } = require("../controllers/reviewController");
 
-const { protect, ownerOrAdminOnly } = require("../middleware/authMiddleware");
+const { protect, ownerOrAdminOnly, optionalProtect } = require("../middleware/authMiddleware");
 
 // ──────────────────────────────────────────────────────
 //  Cafe Routes
 // ──────────────────────────────────────────────────────
+
+// GET  /api/cafes/recommendations — Private/Public (personalized recommendations)
+router.route("/recommendations")
+  .get(optionalProtect, getRecommendations);
+
+// PUT  /api/cafes/bulk-update — Private (Owner/Admin)
+router.route("/bulk-update")
+  .put(protect, ownerOrAdminOnly, bulkUpdateCafes);
 
 // GET  /api/cafes  — Public (search / filter / sort / paginate)
 // POST /api/cafes  — Private (authenticated users only)

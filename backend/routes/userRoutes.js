@@ -7,8 +7,12 @@ const {
   getMyCafes,
   getMyFavorites,
   getOwnerDashboard,
+  getAdminDashboard,
+  getAllUsers,
+  updateUserRole,
+  toggleUserStatus,
 } = require("../controllers/userController");
-const { protect, ownerOrAdminOnly } = require("../middleware/authMiddleware");
+const { protect, adminOnly, ownerOnly } = require("../middleware/authMiddleware");
 
 // GET /api/users/profile   — get current user's profile
 // PUT /api/users/profile   — update name / profileImage
@@ -24,6 +28,19 @@ router.get("/cafes", protect, getMyCafes);
 router.get("/favorites", protect, getMyFavorites);
 
 // GET /api/users/owner-dashboard - stats and cafes for café owners
-router.get("/owner-dashboard", protect, ownerOrAdminOnly, getOwnerDashboard);
+router.get("/owner-dashboard", protect, ownerOnly, getOwnerDashboard);
+
+// GET /api/users/admin-dashboard - stats, cafes and users count for admin
+router.get("/admin-dashboard", protect, adminOnly, getAdminDashboard);
+
+// ── Admin-Only User Management Routes ──
+// GET /api/users - get all registered users
+router.get("/", protect, adminOnly, getAllUsers);
+
+// PUT /api/users/:id/role - update user role (admin only)
+router.put("/:id/role", protect, adminOnly, updateUserRole);
+
+// PUT /api/users/:id/status - toggle user active status (admin only)
+router.put("/:id/status", protect, adminOnly, toggleUserStatus);
 
 module.exports = router;

@@ -36,6 +36,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "", // URL to profile image (Cloudinary in Phase 12, or plain URL)
     },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true, // adds createdAt and updatedAt automatically

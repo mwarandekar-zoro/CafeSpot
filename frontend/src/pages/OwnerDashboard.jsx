@@ -47,10 +47,9 @@ function RatingBar({ label, value, max = 5, color = "var(--accent)" }) {
   );
 }
 
-// ── Spark bar chart (review trend) ───────────────────────────────
+// ── Spark bar chart (average rating trend) ─────────────────────────
 function TrendChart({ trend }) {
   if (!trend || trend.length === 0) return null;
-  const maxCount = Math.max(...trend.map(t => t.count), 1);
 
   return (
     <div style={{ marginTop: "12px" }}>
@@ -58,23 +57,30 @@ function TrendChart({ trend }) {
         display: "flex", alignItems: "flex-end", gap: "6px",
         height: "52px", padding: "0 2px",
       }}>
-        {trend.map(({ month, count }) => (
-          <div
-            key={month}
-            title={`${shortMonth(month)}: ${count} review${count !== 1 ? "s" : ""}`}
-            style={{
-              flex: 1,
-              height: `${Math.max((count / maxCount) * 100, count > 0 ? 8 : 3)}%`,
-              minHeight: count > 0 ? "6px" : "3px",
-              borderRadius: "3px 3px 0 0",
-              background: count > 0
-                ? "linear-gradient(180deg, var(--accent-light), var(--accent))"
-                : "var(--glass-md)",
-              transition: "height 0.6s ease",
-              cursor: "default",
-            }}
-          />
-        ))}
+        {trend.map(({ month, count, avgRating }) => {
+          const rating = avgRating || 0;
+          const barColor = rating >= 4.0 
+            ? "linear-gradient(180deg, var(--success), var(--success)bb)" 
+            : rating >= 3.0 
+              ? "linear-gradient(180deg, var(--accent-light), var(--accent))" 
+              : "linear-gradient(180deg, var(--error), var(--error)bb)";
+          
+          return (
+            <div
+              key={month}
+              title={`${shortMonth(month)}: ${rating > 0 ? rating.toFixed(1) + "★" : "No rating"} (${count} review${count !== 1 ? "s" : ""})`}
+              style={{
+                flex: 1,
+                height: `${rating > 0 ? (rating / 5) * 100 : 8}%`,
+                minHeight: "4px",
+                borderRadius: "3px 3px 0 0",
+                background: rating > 0 ? barColor : "var(--glass-md)",
+                transition: "height 0.6s ease",
+                cursor: "default",
+              }}
+            />
+          );
+        })}
       </div>
       {/* Month labels */}
       <div style={{ display: "flex", gap: "6px", padding: "4px 2px 0" }}>
@@ -128,7 +134,7 @@ function StatCard({ icon, label, value, sub, accent }) {
 }
 
 // ── Cafe analytics card ──────────────────────────────────────────
-function CafeAnalyticsCard({ cafe, isBest, onDelete }) {
+function CafeAnalyticsCard({ cafe, isBest, onDelete, onSelect, selected = false, showCheckbox = false }) {
   const [expanded, setExpanded] = useState(false);
   const cover = cafe.images?.[0] || "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800";
   const r = cafe.ratings || {};
@@ -147,7 +153,23 @@ function CafeAnalyticsCard({ cafe, isBest, onDelete }) {
       <div style={{
         display: "flex", gap: "16px", alignItems: "flex-start",
         padding: "18px 20px", flexWrap: "wrap",
+        position: "relative"
       }}>
+        {showCheckbox && (
+          <div style={{ alignSelf: "center", marginRight: "4px" }}>
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={() => onSelect(cafe._id)}
+              style={{
+                width: "18px",
+                height: "18px",
+                cursor: "pointer",
+                accentColor: "var(--accent)"
+              }}
+            />
+          </div>
+        )}
         <div style={{ position: "relative", flexShrink: 0 }}>
           <img
             src={cover} alt={cafe.name}
@@ -182,8 +204,12 @@ function CafeAnalyticsCard({ cafe, isBest, onDelete }) {
             </span>
           </div>
           <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>📍 {cafe.location}</span>
-          <div style={{ marginTop: "4px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "4px", flexWrap: "wrap" }}>
             <Rating value={cafe.averageRating} count={cafe.reviewCount} showText={true} />
+            <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>•</span>
+            <span style={{ fontSize: "0.78rem", color: "var(--text-secondary)" }}>
+              👁️ {cafe.views || 0} page view{cafe.views !== 1 ? "s" : ""}
+            </span>
           </div>
         </div>
 
@@ -267,6 +293,48 @@ export default function OwnerDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError]   = useState("");
 
+  // Bulk operation states
+  const [selectedCafeIds, setSelectedCafeIds] = useState([]);
+  const [compareModalOpen, setCompareModalOpen] = useState(false);
+  const [bulkEditOpen, setBulkEditOpen] = useState(false);
+  const [bulkCategory, setBulkCategory] = useState("");
+  const [bulkPriceRange, setBulkPriceRange] = useState("");
+  const [bulkUpdating, setBulkUpdating] = useState(false);
+
+  const handleSelectCafe = (cafeId) => {
+    setSelectedCafeIds(prev =>
+      prev.includes(cafeId) ? prev.filter(id => id !== cafeId) : [...prev, cafeId]
+    );
+  };
+
+  const handleBulkUpdateSubmit = async () => {
+    if (selectedCafeIds.length === 0) return;
+    if (!bulkCategory && !bulkPriceRange) {
+      alert("Please select at least one field (Category or Price Range) to bulk update.");
+      return;
+    }
+    try {
+      setBulkUpdating(true);
+      const res = await cafeService.bulkUpdateCafes({
+        ids: selectedCafeIds,
+        category: bulkCategory || undefined,
+        priceRange: bulkPriceRange || undefined
+      });
+      if (res.success) {
+        alert(res.message);
+        setSelectedCafeIds([]);
+        setBulkCategory("");
+        setBulkPriceRange("");
+        setBulkEditOpen(false);
+        fetchDashboardData();
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || err.message || "Failed to bulk update cafés.");
+    } finally {
+      setBulkUpdating(false);
+    }
+  };
+
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -309,7 +377,7 @@ export default function OwnerDashboard() {
     }
   };
 
-  if (loading) return <Loading message="Opening admin dashboard..." />;
+  if (loading) return <Loading message="Opening owner dashboard..." />;
   if (error)   return <ErrorMessage message={error} onRetry={fetchDashboardData} />;
 
   // Flatten + sort recent reviews from all cafes
@@ -328,10 +396,10 @@ export default function OwnerDashboard() {
       <div className="flex-between" style={{ flexWrap: "wrap", gap: "16px", marginBottom: "40px" }}>
         <div>
           <h1 className="section-title">
-            Admin <span className="text-accent">Dashboard</span>
+            Owner <span className="text-accent">Dashboard</span>
           </h1>
           <p className="section-subtitle">
-            Manage listings, view customer ratings, and track performance analytics.
+            Manage your listings, view customer ratings, and track performance analytics.
           </p>
         </div>
         <Link to="/add-cafe" className="btn btn-primary">
@@ -408,6 +476,9 @@ export default function OwnerDashboard() {
                 cafe={cafe}
                 isBest={String(cafe._id) === String(bestCafeId)}
                 onDelete={handleCafeDelete}
+                showCheckbox={cafes.length > 1}
+                selected={selectedCafeIds.includes(cafe._id)}
+                onSelect={handleSelectCafe}
               />
             ))
           )}
@@ -473,11 +544,273 @@ export default function OwnerDashboard() {
         </div>
       </div>
 
+      {/* ── Floating Bulk Action Bar ─────────────────────── */}
+      {selectedCafeIds.length > 0 && (
+        <div style={{
+          position: "fixed",
+          bottom: "24px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          background: "rgba(15, 15, 20, 0.85)",
+          backdropFilter: "blur(16px)",
+          border: "1.5px solid var(--accent)",
+          borderRadius: "var(--radius-lg)",
+          padding: "16px 28px",
+          display: "flex",
+          alignItems: "center",
+          gap: "24px",
+          zIndex: 999,
+          boxShadow: "0 10px 40px rgba(0, 0, 0, 0.5), var(--shadow-glow)",
+          animation: "slideUp 0.3s ease",
+        }}>
+          <span style={{ fontSize: "0.9rem", fontWeight: "600", color: "var(--accent-light)" }}>
+            ⚡ {selectedCafeIds.length} café{selectedCafeIds.length !== 1 ? "s" : ""} selected
+          </span>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button
+              onClick={() => setCompareModalOpen(true)}
+              className="btn btn-ghost btn-sm"
+              style={{ padding: "6px 14px", fontSize: "0.82rem", background: "rgba(255,255,255,0.05)" }}
+            >
+              📊 Compare Stats
+            </button>
+            <button
+              onClick={() => setBulkEditOpen(true)}
+              className="btn btn-ghost btn-sm"
+              style={{ padding: "6px 14px", fontSize: "0.82rem", background: "rgba(255,255,255,0.05)" }}
+            >
+              ✏️ Bulk Edit
+            </button>
+            <button
+              onClick={() => setSelectedCafeIds([])}
+              className="btn btn-ghost btn-sm"
+              style={{ padding: "6px 12px", fontSize: "0.82rem", borderColor: "rgba(255,255,255,0.15)", color: "var(--text-muted)" }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Compare Side-by-Side Modal ────────────────────── */}
+      {compareModalOpen && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)",
+          zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "20px"
+        }}>
+          <div className="glass fade-in" style={{
+            width: "100%", maxWidth: "980px", maxHeight: "90vh",
+            overflowY: "auto", padding: "32px", position: "relative"
+          }}>
+            <button
+              onClick={() => setCompareModalOpen(false)}
+              style={{
+                position: "absolute", top: "20px", right: "20px",
+                background: "none", border: "none", color: "var(--text-muted)",
+                fontSize: "1.4rem", cursor: "pointer"
+              }}
+            >
+              ✕
+            </button>
+            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "1.6rem", marginBottom: "20px" }}>
+              📊 Side-by-Side Performance Comparison
+            </h2>
+
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.88rem" }}>
+                <thead>
+                  <tr style={{ borderBottom: "1.5px solid var(--glass-border)" }}>
+                    <th style={{ padding: "12px 16px", color: "var(--text-muted)" }}>Metric</th>
+                    {cafes.filter(c => selectedCafeIds.includes(c._id)).map(c => (
+                      <th key={c._id} style={{ padding: "12px 16px", minWidth: "160px" }}>
+                        <span style={{ fontWeight: "700", color: "var(--accent-light)" }}>{c.name}</span>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "12px 16px", fontWeight: "600", color: "var(--text-secondary)" }}>Category</td>
+                    {cafes.filter(c => selectedCafeIds.includes(c._id)).map(c => (
+                      <td key={c._id} style={{ padding: "12px 16px" }}>{c.category}</td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "12px 16px", fontWeight: "600", color: "var(--text-secondary)" }}>Price Range</td>
+                    {cafes.filter(c => selectedCafeIds.includes(c._id)).map(c => (
+                      <td key={c._id} style={{ padding: "12px 16px" }}>{c.priceRange}</td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.01)" }}>
+                    <td style={{ padding: "12px 16px", fontWeight: "600", color: "var(--text-secondary)" }}>Total Views (Analytics)</td>
+                    {cafes.filter(c => selectedCafeIds.includes(c._id)).map(c => (
+                      <td key={c._id} style={{ padding: "12px 16px", fontWeight: "700" }}>👁️ {c.views || 0}</td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "12px 16px", fontWeight: "600", color: "var(--text-secondary)" }}>Total Reviews</td>
+                    {cafes.filter(c => selectedCafeIds.includes(c._id)).map(c => (
+                      <td key={c._id} style={{ padding: "12px 16px" }}>✍️ {c.reviewCount || 0}</td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)", background: "rgba(255,255,255,0.01)" }}>
+                    <td style={{ padding: "12px 16px", fontWeight: "600", color: "var(--text-secondary)" }}>Avg. Overall Score</td>
+                    {cafes.filter(c => selectedCafeIds.includes(c._id)).map(c => (
+                      <td key={c._id} style={{ padding: "12px 16px", fontWeight: "700", color: "var(--star-filled)" }}>
+                        ★ {c.averageRating > 0 ? c.averageRating.toFixed(1) : "N/A"}
+                      </td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "12px 16px", color: "var(--text-muted)" }}>Coffee Score</td>
+                    {cafes.filter(c => selectedCafeIds.includes(c._id)).map(c => (
+                      <td key={c._id} style={{ padding: "12px 16px" }}>☕ {c.ratings?.coffee || 0}/5</td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "12px 16px", color: "var(--text-muted)" }}>Food Score</td>
+                    {cafes.filter(c => selectedCafeIds.includes(c._id)).map(c => (
+                      <td key={c._id} style={{ padding: "12px 16px" }}>🍔 {c.ratings?.food || 0}/5</td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "12px 16px", color: "var(--text-muted)" }}>Ambience Score</td>
+                    {cafes.filter(c => selectedCafeIds.includes(c._id)).map(c => (
+                      <td key={c._id} style={{ padding: "12px 16px" }}>🎨 {c.ratings?.ambience || 0}/5</td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "12px 16px", color: "var(--text-muted)" }}>Wi-Fi Score</td>
+                    {cafes.filter(c => selectedCafeIds.includes(c._id)).map(c => (
+                      <td key={c._id} style={{ padding: "12px 16px" }}>📶 {c.ratings?.wifi || 0}/5</td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "12px 16px", color: "var(--text-muted)" }}>Quietness Score</td>
+                    {cafes.filter(c => selectedCafeIds.includes(c._id)).map(c => (
+                      <td key={c._id} style={{ padding: "12px 16px" }}>🔇 {c.ratings?.quietness || 0}/5</td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: "none" }}>
+                    <td style={{ padding: "12px 16px", color: "var(--text-muted)" }}>Value Score</td>
+                    {cafes.filter(c => selectedCafeIds.includes(c._id)).map(c => (
+                      <td key={c._id} style={{ padding: "12px 16px" }}>💰 {c.ratings?.value || 0}/5</td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style={{ marginTop: "24px", display: "flex", justifyContent: "flex-end" }}>
+              <button onClick={() => setCompareModalOpen(false)} className="btn btn-ghost">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Bulk Edit Modal ────────────────────────────────── */}
+      {bulkEditOpen && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)",
+          zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "20px"
+        }}>
+          <div className="glass fade-in" style={{
+            width: "100%", maxWidth: "500px", padding: "32px", position: "relative"
+          }}>
+            <button
+              onClick={() => setBulkEditOpen(false)}
+              style={{
+                position: "absolute", top: "20px", right: "20px",
+                background: "none", border: "none", color: "var(--text-muted)",
+                fontSize: "1.4rem", cursor: "pointer"
+              }}
+            >
+              ✕
+            </button>
+            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "1.6rem", marginBottom: "12px" }}>
+              ✏️ Bulk Edit Selected
+            </h2>
+            <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: "24px" }}>
+              Update properties for {selectedCafeIds.length} selected café listings simultaneously. Leaving a field blank keeps its current value unchanged.
+            </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "600", marginBottom: "6px", color: "var(--text-secondary)" }}>
+                  Vibe Category
+                </label>
+                <select
+                  value={bulkCategory}
+                  onChange={(e) => setBulkCategory(e.target.value)}
+                  style={{
+                    width: "100%", padding: "10px", background: "rgba(0,0,0,0.3)",
+                    border: "1px solid var(--glass-border)", color: "var(--text-primary)",
+                    borderRadius: "var(--radius-sm)", outline: "none"
+                  }}
+                >
+                  <option value="">-- No Change --</option>
+                  <option value="Study">📚 Study Spot</option>
+                  <option value="Work">💻 Work Space</option>
+                  <option value="Date">❤️ Date Café</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: "600", marginBottom: "6px", color: "var(--text-secondary)" }}>
+                  Price Range
+                </label>
+                <select
+                  value={bulkPriceRange}
+                  onChange={(e) => setBulkPriceRange(e.target.value)}
+                  style={{
+                    width: "100%", padding: "10px", background: "rgba(0,0,0,0.3)",
+                    border: "1px solid var(--glass-border)", color: "var(--text-primary)",
+                    borderRadius: "var(--radius-sm)", outline: "none"
+                  }}
+                >
+                  <option value="">-- No Change --</option>
+                  <option value="₹">₹ (Budget)</option>
+                  <option value="₹₹">₹₹ (Moderate)</option>
+                  <option value="₹₹₹">₹₹₹ (Premium)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ marginTop: "32px", display: "flex", justifyContent: "flex-end", gap: "12px" }}>
+              <button
+                onClick={() => setBulkEditOpen(false)}
+                className="btn btn-ghost"
+                disabled={bulkUpdating}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBulkUpdateSubmit}
+                className="btn btn-primary"
+                disabled={bulkUpdating}
+              >
+                {bulkUpdating ? "Saving Changes..." : "Apply Bulk Update"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Inline responsive tweak */}
       <style>{`
         @media (max-width: 768px) {
           .analytics-expand { grid-template-columns: 1fr !important; }
           .dashboard-reviews { display: none; }
+        }
+        @keyframes slideUp {
+          from { transform: translate(-50%, 40px); opacity: 0; }
+          to { transform: translate(-50%, 0); opacity: 1; }
         }
       `}</style>
     </div>

@@ -1,7 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Footer() {
+  const { user, isAuthenticated } = useAuth();
+  const dashboardPath = !isAuthenticated 
+    ? "/login" 
+    : user?.role === "admin" 
+      ? "/admin-dashboard" 
+      : "/owner-dashboard";
   return (
     <footer style={{
       borderTop: "1px solid var(--glass-border)",
@@ -95,13 +102,13 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 3 - Admin */}
+          {/* Column 3 - Portal */}
           <div style={{ display: "flex", flexDirection: "column", gap: "14px", minWidth: "120px" }}>
             <h5 style={{ fontSize: "0.8rem", textTransform: "uppercase", fontWeight: "700", letterSpacing: "0.08em", color: "var(--text-primary)", margin: 0 }}>
-              Admin
+              {!isAuthenticated ? "Management" : user?.role === "admin" ? "Admin" : "Owner"}
             </h5>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "0.85rem" }}>
-              <Link to="/admin-dashboard" className="footer-link">Dashboard</Link>
+              <Link to={dashboardPath} className="footer-link">Dashboard</Link>
               <Link to="/add-cafe" className="footer-link">Add a Café</Link>
             </div>
           </div>

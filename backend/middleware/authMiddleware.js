@@ -35,6 +35,14 @@ const protect = async (req, res, next) => {
       });
     }
 
+    // ── 3b. Confirm user account is not deactivated ──
+    if (user.isActive === false) {
+      return res.status(401).json({
+        success: false,
+        message: "Access denied. Your account has been deactivated by an administrator.",
+      });
+    }
+
     // ── 4. Attach user to request object ──
     req.user = user;
     next();
@@ -84,5 +92,25 @@ const ownerOrAdminOnly = (req, res, next) => {
   });
 };
 
-module.exports = { protect, adminOnly, ownerOnly, ownerOrAdminOnly };
+const optionalProtect = async (req, res, next) => {
+  try {
+    let token;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    }
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id).select("-password");
+      if (user && user.isActive !== false) {
+        req.user = user;
+      }
+    }
+    next();
+  } catch (error) {
+    next();
+  }
+};
+
+module.exports = { protect, adminOnly, ownerOnly, ownerOrAdminOnly, optionalProtect };
 

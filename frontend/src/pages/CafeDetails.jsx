@@ -452,6 +452,7 @@ export default function CafeDetails() {
                     key={rev._id}
                     review={rev}
                     currentUserId={user?._id}
+                    isAdmin={user?.role === "admin"}
                     onEdit={() => handleEditInit(rev)}
                     onDelete={() => handleDeleteReview(rev._id)}
                   />

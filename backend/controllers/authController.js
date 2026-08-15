@@ -120,6 +120,14 @@ const login = async (req, res) => {
       });
     }
 
+    // ── 3b. Confirm user account is not deactivated ──
+    if (user.isActive === false) {
+      return res.status(403).json({
+        success: false,
+        message: "Your account has been deactivated. Please contact an administrator.",
+      });
+    }
+
     // ── 4. Generate JWT and respond ──
     const token = generateToken(user._id);
 

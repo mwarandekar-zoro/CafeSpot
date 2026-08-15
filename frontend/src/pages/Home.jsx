@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { cafeService } from "../services/cafeService";
 import SearchBar from "../components/SearchBar";
 import CafeCard from "../components/CafeCard";
@@ -8,10 +9,15 @@ import ErrorMessage from "../components/ErrorMessage";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [topCafes, setTopCafes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchVal, setSearchVal] = useState("");
+
+  const [recommendedCafes, setRecommendedCafes] = useState([]);
+  const [recLoading, setRecLoading] = useState(false);
+  const [preferredVibe, setPreferredVibe] = useState(null);
 
   const categories = [
     { name: "Coffee", icon: "☕", desc: "For caffeine lovers" },
@@ -64,7 +70,24 @@ export default function Home() {
         setLoading(false);
       }
     };
+
+    const fetchRecommendations = async () => {
+      try {
+        setRecLoading(true);
+        const data = await cafeService.getRecommendations();
+        if (data.success) {
+          setRecommendedCafes(data.cafes);
+          setPreferredVibe(data.preferredCategory);
+        }
+      } catch (err) {
+        console.error("Failed to load recommendations:", err);
+      } finally {
+        setRecLoading(false);
+      }
+    };
+
     fetchTopCafes();
+    fetchRecommendations();
   }, []);
 
   const handleSearchSubmit = (searchTerm) => {
@@ -203,6 +226,38 @@ export default function Home() {
           </div>
         )}
       </section>
+
+      {/* Personalized Recommendations Section */}
+      {recommendedCafes.length > 0 && (
+        <section className="container">
+          <div className="section-header" style={{ marginBottom: "32px" }}>
+            <div>
+              <h2 className="section-title">
+                RECOMMENDED FOR <span className="text-accent">{user?.name ? user.name.toUpperCase() : "YOU"}</span> ✨
+              </h2>
+              <p className="section-subtitle">
+                {preferredVibe 
+                  ? `Fresh spots matching your interest in ${preferredVibe === "Study" ? "quiet study sessions 📚" : preferredVibe === "Work" ? "productive work spaces 💻" : "romantic dates ❤️"}`
+                  : "Personalized suggestions based on top community ratings"
+                }
+              </p>
+            </div>
+            <Link to="/cafes" className="btn btn-ghost btn-sm text-accent" style={{ borderColor: "var(--glass-border-strong)" }}>
+              Explore Vibe Spots
+            </Link>
+          </div>
+
+          {recLoading ? (
+            <Loading />
+          ) : (
+            <div className="cafe-grid">
+              {recommendedCafes.map((cafe) => (
+                <CafeCard key={cafe._id} cafe={cafe} />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Latest Reviews Section */}
       <section className="container">

@@ -95,41 +95,88 @@ export default function Profile() {
     { id: "favorites", label: "💖 My Favorites" },
   ];
 
+  // Calculate visitor statistics based on reviews and favorites
+  const categoryCounts = {};
+  myReviews.forEach(rev => {
+    const cat = rev.cafe?.category;
+    if (cat) {
+      categoryCounts[cat] = (categoryCounts[cat] || 0) + 1.5; // weight reviews higher
+    }
+  });
+  myFavorites.forEach(fav => {
+    const cat = fav.cafe?.category;
+    if (cat) {
+      categoryCounts[cat] = (categoryCounts[cat] || 0) + 1.0;
+    }
+  });
+
+  let topVibe = "N/A";
+  let maxCount = 0;
+  Object.entries(categoryCounts).forEach(([cat, count]) => {
+    if (count > maxCount) {
+      maxCount = count;
+      topVibe = cat;
+    }
+  });
+
+  const vibeLabels = {
+    Study: "Study Spot 📚",
+    Work: "Work Space 💻",
+    Date: "Date Café ❤️"
+  };
+  const topVibeLabel = vibeLabels[topVibe] || "Undecided ☕";
+
   return (
     <div className="container fade-in" style={{ padding: "40px 0 64px 0" }}>
       {/* Header Profile Summary */}
-      <div className="glass-md" style={{
+      <div className="glass-md flex-between" style={{
         padding: "32px",
-        display: "flex",
-        alignItems: "center",
         gap: "24px",
         flexWrap: "wrap",
         marginBottom: "40px"
       }}>
-        <div style={{
-          width: "90px",
-          height: "90px",
-          borderRadius: "50%",
-          background: "var(--glass-border-strong)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "3rem",
-          overflow: "hidden",
-          border: "2px solid var(--accent)"
-        }}>
-          {authUser?.profileImage ? (
-            <img src={authUser.profileImage} alt={authUser.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          ) : (
-            authUser?.name?.charAt(0).toUpperCase() || "👤"
-          )}
+        <div style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}>
+          <div style={{
+            width: "90px",
+            height: "90px",
+            borderRadius: "50%",
+            background: "var(--glass-border-strong)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "3rem",
+            overflow: "hidden",
+            border: "2px solid var(--accent)"
+          }}>
+            {authUser?.profileImage ? (
+              <img src={authUser.profileImage} alt={authUser.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              authUser?.name?.charAt(0).toUpperCase() || "👤"
+            )}
+          </div>
+          <div>
+            <h1 style={{ fontFamily: "var(--font-serif)", fontSize: "2rem" }}>{authUser?.name}</h1>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>{authUser?.email}</p>
+            <span className="badge badge-accent" style={{ marginTop: "8px" }}>
+              {authUser?.role || "user"} role
+            </span>
+          </div>
         </div>
-        <div>
-          <h1 style={{ fontFamily: "var(--font-serif)", fontSize: "2rem" }}>{authUser?.name}</h1>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem" }}>{authUser?.email}</p>
-          <span className="badge badge-accent" style={{ marginTop: "8px" }}>
-            {authUser?.role || "user"} role
-          </span>
+
+        {/* Visitor track statistics */}
+        <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+          <div className="glass-flat" style={{ padding: "12px 20px", display: "flex", flexDirection: "column", minWidth: "120px" }}>
+            <span style={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)", fontWeight: "700" }}>Reviews Posted</span>
+            <span style={{ fontSize: "1.4rem", fontWeight: "800", color: "var(--accent-light)", marginTop: "4px" }}>✍️ {myReviews.length}</span>
+          </div>
+          <div className="glass-flat" style={{ padding: "12px 20px", display: "flex", flexDirection: "column", minWidth: "160px" }}>
+            <span style={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)", fontWeight: "700" }}>Top Vibe Preference</span>
+            <span style={{ fontSize: "1.05rem", fontWeight: "700", color: "var(--text-primary)", marginTop: "4px" }}>{topVibeLabel}</span>
+          </div>
+          <div className="glass-flat" style={{ padding: "12px 20px", display: "flex", flexDirection: "column", minWidth: "120px" }}>
+            <span style={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--text-muted)", fontWeight: "700" }}>Saved Favorites</span>
+            <span style={{ fontSize: "1.4rem", fontWeight: "800", color: "var(--accent-light)", marginTop: "4px" }}>💖 {myFavorites.length}</span>
+          </div>
         </div>
       </div>
 

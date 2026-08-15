@@ -25,4 +25,20 @@ export const userService = {
     const { data } = await api.get("/users/owner-dashboard");
     return data; // { success, stats, cafes }
   },
+  getAdminDashboard: async () => {
+    const { data } = await api.get("/users/admin-dashboard");
+    return data; // { success, stats, cafes }
+  },
+  getAllUsers: async () => {
+    const { data } = await api.get("/users");
+    return data; // { success, count, users }
+  },
+  updateUserRole: async (userId, role) => {
+    const { data } = await api.put(`/users/${userId}/role`, { role });
+    return data; // { success, message, user }
+  },
+  toggleUserStatus: async (userId) => {
+    const { data } = await api.put(`/users/${userId}/status`);
+    return data; // { success, message, user }
+  },
 };

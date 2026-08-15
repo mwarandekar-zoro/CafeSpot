@@ -1,7 +1,7 @@
 import React from "react";
 import Rating from "./Rating";
 
-export default function ReviewCard({ review, onEdit, onDelete, currentUserId }) {
+export default function ReviewCard({ review, onEdit, onDelete, currentUserId, isAdmin = false }) {
   if (!review) return null;
 
   const {
@@ -64,9 +64,9 @@ export default function ReviewCard({ review, onEdit, onDelete, currentUserId }) 
 
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <Rating value={overallRating} showText={true} />
-          {isOwner && (
+          {(isOwner || isAdmin) && (
             <div style={{ display: "flex", gap: "8px" }}>
-              {onEdit && (
+              {isOwner && onEdit && (
                 <button onClick={onEdit} className="btn btn-ghost btn-sm" style={{ padding: "4px 8px" }}>
                   ✏️
                 </button>

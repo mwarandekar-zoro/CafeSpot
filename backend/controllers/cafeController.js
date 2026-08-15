@@ -107,15 +107,18 @@ const getCafeById = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid cafe ID" });
     }
 
-    const cafeDoc = await Cafe.findById(req.params.id)
-      .populate("createdBy", "name profileImage");
+    // Increment views counter
+    const cafeDoc = await Cafe.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { views: 1 } },
+      { new: true }
+    ).populate("createdBy", "name profileImage");
 
-    // toObject({ virtuals: true }) correctly serialises nested vibe virtuals
-    const cafe = cafeDoc ? cafeDoc.toObject({ virtuals: true }) : null;
-
-    if (!cafe) {
+    if (!cafeDoc) {
       return res.status(404).json({ success: false, message: "Cafe not found" });
     }
+
+    const cafe = cafeDoc.toObject({ virtuals: true });
 
     res.status(200).json({ success: true, cafe });
   } catch (error) {
@@ -265,5 +268,126 @@ const deleteCafe = async (req, res) => {
   }
 };
 
-module.exports = { getCafes, getCafeById, createCafe, updateCafe, deleteCafe };
+// ─────────────────────────────────────────────────────────────────
+// @desc    Bulk update cafes (category, price range)
+// @route   PUT /api/cafes/bulk-update
+// @access  Private — owner or admin
+// ─────────────────────────────────────────────────────────────────
+const bulkUpdateCafes = async (req, res) => {
+  try {
+    const { ids, category, priceRange } = req.body;
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ success: false, message: "No café IDs provided." });
+    }
+
+    const updateFields = {};
+    if (category) updateFields.category = category;
+    if (priceRange) updateFields.priceRange = priceRange;
+
+    if (Object.keys(updateFields).length === 0) {
+      return res.status(400).json({ success: false, message: "No fields provided to update." });
+    }
+
+    // Ownership verification: users must own all target cafes unless they are admin
+    if (req.user.role !== "admin") {
+      const count = await Cafe.countDocuments({ _id: { $in: ids }, createdBy: req.user._id });
+      if (count !== ids.length) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. You do not own all selected café listings."
+        });
+      }
+    }
+
+    await Cafe.updateMany({ _id: { $in: ids } }, { $set: updateFields });
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully updated ${ids.length} cafés.`
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────
+// @desc    Get personalized recommendations for the logged-in user
+// @route   GET /api/cafes/recommendations
+// @access  Private/Public (graceful fallback if not logged in)
+// ─────────────────────────────────────────────────────────────────
+const getRecommendations = async (req, res) => {
+  try {
+    const Review = require("../models/Review");
+    const Favorite = require("../models/Favorite");
+
+    const userId = req.user ? req.user._id : null;
+    if (!userId) {
+      // Cold start / Guest: suggest 3 top rated cafes
+      const defaultCafes = await Cafe.find({}).sort({ averageRating: -1 }).limit(3);
+      return res.status(200).json({ success: true, cafes: defaultCafes });
+    }
+
+    // 1. Fetch user's favorites
+    const favs = await Favorite.find({ user: userId });
+    const favCafeIds = favs.map(f => f.cafe.toString());
+
+    // 2. Fetch user's reviews
+    const reviews = await Review.find({ user: userId });
+    const reviewedCafeIds = reviews.map(r => r.cafe.toString());
+
+    const interactedCafeIds = new Set([...favCafeIds, ...reviewedCafeIds]);
+
+    // 3. Score categories based on user interactions
+    const categoryScores = {};
+    const interactedCafes = await Cafe.find({ _id: { $in: Array.from(interactedCafeIds) } });
+    interactedCafes.forEach(c => {
+      if (c.category) {
+        categoryScores[c.category] = (categoryScores[c.category] || 0) + 1.0;
+      }
+    });
+
+    // Find the category with maximum score
+    let preferredCategory = null;
+    let maxScore = 0;
+    Object.entries(categoryScores).forEach(([cat, score]) => {
+      if (score > maxScore) {
+        maxScore = score;
+        preferredCategory = cat;
+      }
+    });
+
+    let query = {};
+    if (preferredCategory) {
+      query = {
+        category: preferredCategory,
+        _id: { $nin: Array.from(interactedCafeIds) }
+      };
+    } else {
+      query = {
+        _id: { $nin: Array.from(interactedCafeIds) }
+      };
+    }
+
+    let recommended = await Cafe.find(query)
+      .sort({ averageRating: -1 })
+      .limit(3);
+
+    // Fallback: fill recommendations if there are less than 3 matching items
+    if (recommended.length < 3) {
+      const extraCount = 3 - recommended.length;
+      const excludedIds = new Set([...interactedCafeIds, ...recommended.map(c => c._id.toString())]);
+      const fallbacks = await Cafe.find({ _id: { $nin: Array.from(excludedIds) } })
+        .sort({ averageRating: -1 })
+        .limit(extraCount);
+      recommended = [...recommended, ...fallbacks];
+    }
+
+    res.status(200).json({ success: true, cafes: recommended, preferredCategory });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+module.exports = { getCafes, getCafeById, createCafe, updateCafe, deleteCafe, bulkUpdateCafes, getRecommendations };
 

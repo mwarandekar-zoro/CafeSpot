@@ -219,6 +219,88 @@ export default function CafeDetails() {
 
   const userExistingReview = reviews.find((rev) => rev.user?._id === user?._id);
 
+  const getHighlights = (ratings = {}) => {
+    const highlights = [];
+    if (!ratings) return highlights;
+    
+    if (ratings.wifi >= 4 && ratings.quietness >= 4) {
+      highlights.push({
+        icon: "📚",
+        title: "Great for studying",
+        desc: "Quiet environment + strong Wi-Fi connection"
+      });
+    } else if (ratings.wifi >= 4.2) {
+      highlights.push({
+        icon: "💻",
+        title: "Excellent for working",
+        desc: "High-speed Wi-Fi and reliable workspace"
+      });
+    }
+    
+    if (ratings.coffee >= 4.3) {
+      highlights.push({
+        icon: "☕",
+        title: "Coffee is the highlight",
+        desc: `${ratings.coffee.toFixed(1)}/5 rating from visitors`
+      });
+    }
+    
+    if (ratings.ambience >= 4.3) {
+      highlights.push({
+        icon: "✨",
+        title: "Beautiful Ambiance",
+        desc: "Highly rated for its cozy and welcoming atmosphere"
+      });
+    }
+    
+    if (ratings.value >= 4.3) {
+      highlights.push({
+        icon: "💰",
+        title: "Excellent Value",
+        desc: "Great quality coffee and food at a very fair price"
+      });
+    }
+
+    if (ratings.food >= 4.3) {
+      highlights.push({
+        icon: "🍕",
+        title: "Delicious Food Options",
+        desc: "Highly recommended for snacks and eats"
+      });
+    }
+
+    // Fallback if no highlights found but reviews exist
+    if (highlights.length === 0 && Object.keys(ratings).length > 0 && cafe.reviewCount > 0) {
+      const sorted = Object.entries(ratings)
+        .filter(([_, val]) => val > 0)
+        .sort((a, b) => b[1] - a[1]);
+      
+      if (sorted.length > 0) {
+        const [topKey, topVal] = sorted[0];
+        const labelMap = {
+          coffee: { icon: "☕", title: "Top-tier Coffee", desc: "Our highest rated aspect by visitors" },
+          food: { icon: "🍕", title: "Good Food", desc: "Highly rated selection of snacks and dishes" },
+          ambience: { icon: "✨", title: "Pleasant Ambiance", desc: "Enjoyable seating area and environment" },
+          wifi: { icon: "📶", title: "Decent Wi-Fi", desc: "Reliable connectivity for browse & chat" },
+          quietness: { icon: "🤫", title: "Quiet & Calm", desc: "Good spot to escape the noise" },
+          value: { icon: "💎", title: "Fair Pricing", desc: "Good balance of price and quality" }
+        };
+        const item = labelMap[topKey];
+        if (item) {
+          highlights.push({
+            icon: item.icon,
+            title: item.title,
+            desc: `${topVal.toFixed(1)}/5 average score`
+          });
+        }
+      }
+    }
+
+    return highlights;
+  };
+
+  const highlights = getHighlights(cafe?.ratings);
+
   return (
     <div className="container fade-in" style={{ padding: "40px 0 64px 0" }}>
       {/* Back Link */}
@@ -298,6 +380,59 @@ export default function CafeDetails() {
             <p style={{ fontSize: "0.95rem", color: "var(--text-primary)", whiteSpace: "pre-line" }}>
               {cafe.description}
             </p>
+
+            {highlights.length > 0 && (
+              <>
+                <div className="divider" />
+                <div style={{ marginTop: "24px" }}>
+                  <h3 style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "0.78rem",
+                    textTransform: "uppercase",
+                    color: "var(--text-muted)",
+                    fontWeight: "700",
+                    letterSpacing: "0.08em",
+                    marginBottom: "16px"
+                  }}>
+                    ✨ Why people love this spot
+                  </h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "16px" }}>
+                    {highlights.map((h, index) => (
+                      <div key={index} style={{
+                        display: "flex",
+                        gap: "12px",
+                        padding: "14px 18px",
+                        background: "var(--glass)",
+                        border: "1px solid var(--glass-border)",
+                        borderRadius: "var(--radius-md)",
+                        transition: "all var(--transition)"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                        e.currentTarget.style.borderColor = "var(--accent)";
+                        e.currentTarget.style.boxShadow = "var(--shadow-glow)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.borderColor = "var(--glass-border)";
+                        e.currentTarget.style.boxShadow = "none";
+                      }}
+                      >
+                        <span style={{ fontSize: "1.6rem", flexShrink: 0 }}>{h.icon}</span>
+                        <div>
+                          <h4 style={{ fontSize: "0.92rem", fontWeight: "600", color: "var(--text-primary)", margin: "0 0 4px" }}>
+                            {h.title}
+                          </h4>
+                          <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", margin: 0, lineHeight: 1.4 }}>
+                            {h.desc}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Review List block */}

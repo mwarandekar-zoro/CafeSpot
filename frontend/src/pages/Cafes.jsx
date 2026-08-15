@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { cafeService } from "../services/cafeService";
 import { favoriteService } from "../services/favoriteService";
 import { useAuth } from "../context/AuthContext";
-import SearchBar from "../components/SearchBar";
-import FilterPanel from "../components/FilterPanel";
 import CafeCard from "../components/CafeCard";
 import Loading from "../components/Loading";
 import ErrorMessage from "../components/ErrorMessage";
@@ -110,13 +108,6 @@ export default function Cafes() {
     updateFilters({ ...currentFilters, search: val });
   };
 
-  const handleFilterPanelChange = (updatedFilters) => {
-    updateFilters({
-      ...currentFilters,
-      ...updatedFilters,
-    });
-  };
-
   const handleClearFilters = () => {
     setSearchParams({});
   };
@@ -154,107 +145,195 @@ export default function Cafes() {
   return (
     <div className="container fade-in" style={{ padding: "40px 0 64px 0" }}>
       {/* Header */}
-      <div style={{ marginBottom: "32px", display: "flex", flexDirection: "column", gap: "16px" }}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
-          <h1 className="section-title">Explore All <span className="text-accent">Cafés</span></h1>
-          <button
-            onClick={() => {
-              const params = new URLSearchParams();
-              if (search) params.set("search", search);
-              if (category) params.set("category", category);
-              navigate(`/map?${params.toString()}`);
+      <div style={{ marginBottom: "24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+        <div>
+          <h1 className="section-title" style={{ margin: 0 }}>Explore All <span className="text-accent">Cafés</span></h1>
+          <p className="section-subtitle" style={{ margin: "4px 0 0" }}>Find your perfect spot based on custom features and rating profiles</p>
+        </div>
+        <button
+          onClick={() => {
+            const params = new URLSearchParams();
+            if (search) params.set("search", search);
+            if (category) params.set("category", category);
+            navigate(`/map?${params.toString()}`);
+          }}
+          className="btn btn-ghost btn-sm"
+          style={{
+            borderColor: "var(--glass-border-strong)",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            fontWeight: "700",
+            letterSpacing: "0.03em",
+          }}
+        >
+          🗺 Map View
+        </button>
+      </div>
+
+      {/* Sticky Horizontal Filter Bar */}
+      <div className="glass sticky-filter-bar" style={{
+        position: "sticky",
+        top: "calc(var(--navbar-h) + 12px)",
+        zIndex: 90,
+        padding: "12px 18px",
+        marginBottom: "36px",
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        flexWrap: "wrap",
+        borderRadius: "var(--radius-lg)",
+        background: "var(--glass-hover)",
+        backdropFilter: "var(--blur-md)",
+        border: "1px solid var(--glass-border-strong)",
+        boxShadow: "var(--shadow-md)"
+      }}>
+        {/* Search field */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flex: "1 1 200px", minWidth: "180px", background: "rgba(0,0,0,0.25)", borderRadius: "var(--radius-sm)", border: "1px solid var(--glass-border)", padding: "6px 12px" }}>
+          <span style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>🔍</span>
+          <input
+            type="text"
+            placeholder="Search cafés, locations, vibes..."
+            value={search}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            style={{
+              background: "none",
+              border: "none",
+              outline: "none",
+              color: "var(--text-primary)",
+              fontSize: "0.85rem",
+              width: "100%"
             }}
+          />
+        </div>
+
+        {/* Category Vibe selector */}
+        <select
+          value={category}
+          onChange={(e) => updateFilters({ ...currentFilters, category: e.target.value })}
+          className="filter-select"
+        >
+          <option value="">🔮 All Vibes</option>
+          <option value="Coffee">☕ Coffee</option>
+          <option value="Study">📚 Study</option>
+          <option value="Work">💻 Work</option>
+          <option value="Date">❤️ Date</option>
+          <option value="Chill">🌙 Chill</option>
+          <option value="Budget">💰 Budget</option>
+        </select>
+
+        {/* Price selector */}
+        <select
+          value={price}
+          onChange={(e) => updateFilters({ ...currentFilters, price: e.target.value })}
+          className="filter-select"
+        >
+          <option value="">💰 Any Price</option>
+          <option value="$">₹ (Budget)</option>
+          <option value="$$">₹₹ (Mid-range)</option>
+          <option value="$$$">₹₹₹ (Premium)</option>
+        </select>
+
+        {/* Rating selector */}
+        <select
+          value={minRating}
+          onChange={(e) => updateFilters({ ...currentFilters, minRating: e.target.value })}
+          className="filter-select"
+        >
+          <option value="">⭐ Any Rating</option>
+          <option value="3">⭐ 3.0+</option>
+          <option value="4">⭐ 4.0+</option>
+          <option value="4.5">⭐ 4.5+</option>
+        </select>
+
+        {/* Sort selector */}
+        <select
+          value={sort}
+          onChange={(e) => updateFilters({ ...currentFilters, sort: e.target.value })}
+          className="filter-select"
+          style={{ marginLeft: "auto" }}
+        >
+          <option value="newest">📅 Newest Spots</option>
+          <option value="rating">🏆 Highest Rated</option>
+          <option value="popular">🔥 Most Popular</option>
+        </select>
+
+        {/* Reset filter button */}
+        {(search || category || price || minRating) && (
+          <button
+            onClick={handleClearFilters}
             className="btn btn-ghost btn-sm"
             style={{
-              borderColor: "var(--glass-border-strong)",
-              display: "flex", alignItems: "center", gap: "6px",
-              fontWeight: "700", letterSpacing: "0.03em",
-              flexShrink: 0,
+              padding: "8px 14px",
+              fontSize: "0.8rem",
+              borderRadius: "var(--radius-sm)",
+              borderColor: "rgba(224, 82, 82, 0.3)",
+              color: "var(--error)"
             }}
           >
-            🗺 Map View
+            Clear Filters
           </button>
-        </div>
-        <div style={{ maxWidth: "700px" }}>
-          <SearchBar value={search} onChange={handleSearchChange} placeholder="Search cafe by name, city, vibe tags..." />
-        </div>
+        )}
       </div>
 
-      <div style={{ display: "flex", gap: "32px", flexWrap: "wrap" }}>
-        {/* Filter Panel - Sidebar */}
-        <aside style={{ flex: "1 1 280px", maxWidth: "340px" }} className="aside-filters">
-          <FilterPanel
-            filters={currentFilters}
-            onChange={handleFilterPanelChange}
-            onClear={handleClearFilters}
+      {/* Main Grid View */}
+      <main style={{ width: "100%", display: "flex", flexDirection: "column", gap: "32px" }}>
+        {loading ? (
+          <Loading />
+        ) : error ? (
+          <ErrorMessage message={error} onRetry={fetchCafes} />
+        ) : cafes.length === 0 ? (
+          <EmptyState
+            title="No Cafés Found"
+            description="We couldn't find any cafés matching your search terms or filters. Try clearing your filters or testing other terms."
+            actionText="Reset All Filters"
+            onAction={handleClearFilters}
           />
-        </aside>
+        ) : (
+          <>
+            {/* Metadata count */}
+            <div className="flex-between text-secondary" style={{ fontSize: "0.85rem", marginTop: "-16px" }}>
+              <span>Found {total} {total === 1 ? "café" : "cafés"}</span>
+              <span>Page {page} of {totalPages}</span>
+            </div>
 
-        {/* Cafe Cards Feed */}
-        <main style={{ flex: "2 1 600px", display: "flex", flexDirection: "column", gap: "32px" }}>
-          {loading ? (
-            <Loading />
-          ) : error ? (
-            <ErrorMessage message={error} onRetry={fetchCafes} />
-          ) : cafes.length === 0 ? (
-            <EmptyState
-              title="No Cafés Found"
-              description="We couldn't find any cafés matching your search terms or filters. Try clearing your filters or testing other terms."
-              actionText="Reset All Filters"
-              onAction={handleClearFilters}
-            />
-          ) : (
-            <>
-              {/* Count & Pagination Top Bar */}
-              <div className="flex-between text-secondary" style={{ fontSize: "0.9rem" }}>
-                <span>Found {total} {total === 1 ? "cafe" : "cafes"}</span>
-                <span>Page {page} of {totalPages}</span>
+            {/* Grid */}
+            <div className="cafe-grid">
+              {cafes.map((cafe) => (
+                <CafeCard
+                  key={cafe._id}
+                  cafe={cafe}
+                  isFavorited={favorites.includes(cafe._id)}
+                  onFavoriteToggle={handleFavoriteToggle}
+                />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex-center mt-4" style={{ gap: "16px" }}>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  disabled={page <= 1}
+                  onClick={() => handlePageChange(page - 1)}
+                >
+                  ◀ Prev
+                </button>
+                <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>
+                  Page {page} of {totalPages}
+                </span>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  disabled={page >= totalPages}
+                  onClick={() => handlePageChange(page + 1)}
+                >
+                  Next ▶
+                </button>
               </div>
-
-              {/* Grid */}
-              <div className="cafe-grid">
-                {cafes.map((cafe) => (
-                  <CafeCard
-                    key={cafe._id}
-                    cafe={cafe}
-                    isFavorited={favorites.includes(cafe._id)}
-                    onFavoriteToggle={handleFavoriteToggle}
-                  />
-                ))}
-              </div>
-
-              {/* Pagination controls */}
-              {totalPages > 1 && (
-                <div className="flex-center mt-4" style={{ gap: "16px" }}>
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    disabled={page <= 1}
-                    onClick={() => handlePageChange(page - 1)}
-                  >
-                    ◀ Prev
-                  </button>
-                  <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>
-                    Page {page} of {totalPages}
-                  </span>
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    disabled={page >= totalPages}
-                    onClick={() => handlePageChange(page + 1)}
-                  >
-                    Next ▶
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </main>
-      </div>
-
-      <style>{`
-        @media (max-width: 950px) {
-          .aside-filters { max-width: 100% !important; width: 100% !important; flex: 1 1 100% !important; }
-        }
-      `}</style>
+            )}
+          </>
+        )}
+      </main>
     </div>
   );
 }

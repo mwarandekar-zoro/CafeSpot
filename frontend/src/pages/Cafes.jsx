@@ -7,6 +7,7 @@ import CafeCard from "../components/CafeCard";
 import Loading from "../components/Loading";
 import ErrorMessage from "../components/ErrorMessage";
 import EmptyState from "../components/EmptyState";
+import { CafeCardSkeleton } from "../components/Skeletons";
 
 export default function Cafes() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -279,7 +280,11 @@ export default function Cafes() {
       {/* Main Grid View */}
       <main style={{ width: "100%", display: "flex", flexDirection: "column", gap: "32px" }}>
         {loading ? (
-          <Loading />
+          <div className="cafe-grid">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <CafeCardSkeleton key={idx} />
+            ))}
+          </div>
         ) : error ? (
           <ErrorMessage message={error} onRetry={fetchCafes} />
         ) : cafes.length === 0 ? (

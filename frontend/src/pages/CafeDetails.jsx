@@ -8,6 +8,7 @@ import Rating from "../components/Rating";
 import VibeScore from "../components/VibeScore";
 import ReviewCard from "../components/ReviewCard";
 import CafeCard from "../components/CafeCard";
+import { CafeDetailsSkeleton, ReviewCardSkeleton, CafeCardSkeleton } from "../components/Skeletons";
 
 function RatingSelector({ label, value, onChange }) {
   return (
@@ -203,7 +204,7 @@ export default function CafeDetails() {
     setEditingReviewId(null);
   };
 
-  if (loading) return <Loading message="Entering the cafe spot..." />;
+  if (loading) return <CafeDetailsSkeleton />;
   if (error) return <ErrorMessage message={error} onRetry={fetchCafeDetails} />;
   if (!cafe) return <ErrorMessage message="Cafe not found." />;
 
@@ -440,7 +441,10 @@ export default function CafeDetails() {
             <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "1.5rem" }}>Community Reviews</h2>
 
             {reviewsLoading ? (
-              <Loading message="Reading reviews..." />
+              <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                <ReviewCardSkeleton />
+                <ReviewCardSkeleton />
+              </div>
             ) : reviews.length === 0 ? (
               <div style={{ textAlign: "center", padding: "20px", color: "var(--text-secondary)", fontSize: "0.9rem" }}>
                 No reviews yet. Be the first to share your experience!
@@ -559,7 +563,11 @@ export default function CafeDetails() {
                 You Might Also <span className="text-accent">Like</span>
               </h2>
               {similarLoading ? (
-                <Loading message="Finding similar vibes..." />
+                <div className="cafe-grid">
+                  <CafeCardSkeleton />
+                  <CafeCardSkeleton />
+                  <CafeCardSkeleton />
+                </div>
               ) : (
                 <div className="cafe-grid">
                   {similarCafes.map((sc) => (

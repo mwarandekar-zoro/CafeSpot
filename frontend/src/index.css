@@ -1009,3 +1009,21 @@ a:focus-visible {
     display: none !important;
   }
 }
+
+/* ── Skeleton Shimmer Loader Styles ───────────────────────────────── */
+@keyframes skeleton-shimmer-anim {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.08) 37%,
+    rgba(255, 255, 255, 0.03) 63%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer-anim 1.4s ease-in-out infinite;
+}
+

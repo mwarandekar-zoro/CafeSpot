@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import Home from "./pages/Home";
@@ -36,6 +36,9 @@ function ProtectedRoute({ children, allowedRoles }) {
 }
 
 function AppContent() {
+  const location = useLocation();
+  const isMapPage = location.pathname === "/map";
+
   return (
     <div className="app-shell">
       <BackgroundBlobs />
@@ -72,7 +75,7 @@ function AppContent() {
           } />
         </Routes>
       </div>
-      <Footer />
+      {!isMapPage && <Footer />}
     </div>
   );
 }

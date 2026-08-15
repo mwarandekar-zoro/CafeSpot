@@ -956,3 +956,21 @@ a:focus-visible {
   }
 }
 
+/* ── Footer ─────────────────────────────────────────────────────── */
+.footer-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.footer-link:hover {
+  color: var(--accent-light) !important;
+  text-shadow: 0 0 8px var(--accent-glow);
+}
+
+@media (max-width: 600px) {
+  .footer-links-wrap {
+    justify-content: flex-start !important;
+    gap: 32px !important;
+  }
+}
+

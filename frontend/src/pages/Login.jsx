@@ -43,7 +43,7 @@ export default function Login() {
   if (!selectedRole) {
     return (
       <div className="flex-center page-content container fade-in" style={{ paddingBottom: "64px" }}>
-        <div style={{ maxWidth: "680px", textAlign: "center", display: "flex", flexDirection: "column", gap: "24px", alignItems: "center" }}>
+        <div style={{ maxWidth: "960px", textAlign: "center", display: "flex", flexDirection: "column", gap: "24px", alignItems: "center" }}>
           <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "2.2rem" }}>Choose Your Entrance Vibe</h2>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", maxWidth: "480px" }}>
             Select how you want to access the CaféSpot platform today to tailor your experience.

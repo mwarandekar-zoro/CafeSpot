@@ -41,10 +41,11 @@ export default function Login() {
     }
   };
 
-  if (!selectedRole) {
-    return (
-      <div className="flex-center page-content container fade-in" style={{ paddingBottom: "64px", position: "relative" }}>
-        <FloatingCafeBackground />
+  return (
+    <div className="flex-center page-content container fade-in" style={{ paddingBottom: "64px", position: "relative" }}>
+      <FloatingCafeBackground />
+      
+      {!selectedRole ? (
         <div style={{ maxWidth: "960px", textAlign: "center", display: "flex", flexDirection: "column", gap: "24px", alignItems: "center" }}>
           <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "2.2rem" }}>Choose Your Entrance Vibe</h2>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", maxWidth: "480px" }}>
@@ -149,102 +150,98 @@ export default function Login() {
             </div>
           </div>
         </div>
-      </div>
-    );
-  }
+      ) : (
+        <div className="glass-md" style={{
+          width: "100%",
+          maxWidth: "420px",
+          padding: "40px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "24px",
+          zIndex: 1
+        }}>
+          <button
+            onClick={() => setSelectedRole(null)}
+            style={{
+              alignSelf: "flex-start",
+              background: "none",
+              border: "none",
+              color: "var(--accent-light)",
+              fontSize: "0.85rem",
+              fontWeight: "600",
+              cursor: "pointer"
+            }}
+          >
+            ← Change Role
+          </button>
 
-  return (
-    <div className="flex-center page-content container fade-in" style={{ paddingBottom: "64px", position: "relative" }}>
-      <FloatingCafeBackground />
-      <div className="glass-md" style={{
-        width: "100%",
-        maxWidth: "420px",
-        padding: "40px",
-        display: "flex",
-        flexDirection: "column",
-        gap: "24px"
-      }}>
-        <button
-          onClick={() => setSelectedRole(null)}
-          style={{
-            alignSelf: "flex-start",
-            background: "none",
-            border: "none",
-            color: "var(--accent-light)",
-            fontSize: "0.85rem",
-            fontWeight: "600",
-            cursor: "pointer"
-          }}
-        >
-          ← Change Role
-        </button>
+          <div style={{ textAlign: "center" }}>
+            <span style={{ fontSize: "2.5rem" }}>☕</span>
+            <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "1.6rem", marginTop: "12px" }}>
+              Login as {selectedRole === "admin" ? "Administrator" : selectedRole === "owner" ? "Café Owner" : "Café Explorer"}
+            </h2>
+            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "4px" }}>
+              Log in to manage your favorites and share café vibes.
+            </p>
+          </div>
 
-        <div style={{ textAlign: "center" }}>
-          <span style={{ fontSize: "2.5rem" }}>☕</span>
-          <h2 style={{ fontFamily: "var(--font-serif)", fontSize: "1.6rem", marginTop: "12px" }}>
-            Login as {selectedRole === "admin" ? "Administrator" : selectedRole === "owner" ? "Café Owner" : "Café Explorer"}
-          </h2>
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: "4px" }}>
-            Log in to manage your favorites and share café vibes.
+          {error && (
+            <div className="badge badge-error" style={{
+              padding: "10px 14px",
+              borderRadius: "var(--radius-md)",
+              textTransform: "none",
+              fontSize: "0.85rem",
+              width: "100%",
+              display: "block",
+              textAlign: "center"
+            }}>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div className="form-group">
+              <label className="form-label">Email Address</label>
+              <input
+                type="email"
+                className="form-input"
+                required
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Password</label>
+              <input
+                type="password"
+                className="form-input"
+                required
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary btn-full"
+              disabled={submitting}
+              style={{ marginTop: "8px" }}
+            >
+              {submitting ? "Logging in..." : "Log In"}
+            </button>
+          </form>
+
+          <p style={{ textSelf: "center", fontSize: "0.85rem", color: "var(--text-secondary)", textAlign: "center" }}>
+            Don't have an account?{" "}
+            <Link to="/register" style={{ color: "var(--accent-light)", fontWeight: "600" }}>
+              Sign Up
+            </Link>
           </p>
         </div>
-
-        {error && (
-          <div className="badge badge-error" style={{
-            padding: "10px 14px",
-            borderRadius: "var(--radius-md)",
-            textTransform: "none",
-            fontSize: "0.85rem",
-            width: "100%",
-            display: "block",
-            textAlign: "center"
-          }}>
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-          <div className="form-group">
-            <label className="form-label">Email Address</label>
-            <input
-              type="email"
-              className="form-input"
-              required
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              className="form-input"
-              required
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="btn btn-primary btn-full"
-            disabled={submitting}
-            style={{ marginTop: "8px" }}
-          >
-            {submitting ? "Logging in..." : "Log In"}
-          </button>
-        </form>
-
-        <p style={{ textSelf: "center", fontSize: "0.85rem", color: "var(--text-secondary)", textAlign: "center" }}>
-          Don't have an account?{" "}
-          <Link to="/register" style={{ color: "var(--accent-light)", fontWeight: "600" }}>
-            Sign Up
-          </Link>
-        </p>
-      </div>
+      )}
     </div>
   );
 }

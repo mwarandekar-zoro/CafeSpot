@@ -159,6 +159,7 @@ export default function MapView() {
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const [price, setPrice]       = useState(searchParams.get("price") || "");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [hoveredCafeId, setHoveredCafeId] = useState(null);
 
   const sidebarRef  = useRef(null);
   const activeCardRef = useRef(null);
@@ -367,6 +368,8 @@ export default function MapView() {
                 <div
                   key={cafe._id}
                   ref={activeCafe?._id === cafe._id ? activeCardRef : null}
+                  onMouseEnter={() => setHoveredCafeId(cafe._id)}
+                  onMouseLeave={() => setHoveredCafeId(null)}
                 >
                   <SidebarCafeCard
                     cafe={cafe}
@@ -416,7 +419,7 @@ export default function MapView() {
             <Marker
               key={cafe._id}
               position={[cafe.lat, cafe.lng]}
-              icon={createCoffeeMarker(cafe.category, activeCafe?._id === cafe._id)}
+              icon={createCoffeeMarker(cafe.category, activeCafe?._id === cafe._id || hoveredCafeId === cafe._id)}
               ref={el => { if (el) popupRefs.current[cafe._id] = el; }}
               eventHandlers={{
                 click: () => handleMarkerClick(cafe),

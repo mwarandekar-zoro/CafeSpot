@@ -869,3 +869,52 @@ a:focus-visible {
 /* Trend bar tooltip (uses native title= tooltip, styled via cursor) */
 .analytics-expand [title] { cursor: help; }
 
+/* ================================================================
+   INTERACTIVE CARDS POLISH
+   Subtle premium hover lifts, zooms, borders, and animations
+   ================================================================ */
+
+.cafe-card {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.cafe-card:hover {
+  transform: translateY(-5px) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: var(--shadow-glow), var(--shadow-md) !important;
+}
+
+/* Image zoom transition */
+.cafe-card-image {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+.cafe-card:hover .cafe-card-image {
+  transform: scale(1.04) !important; /* 4% zoom */
+}
+
+/* Link arrow slide on card hover */
+.cafe-card-link {
+  transition: color 0.3s ease;
+}
+.cafe-card-link:hover {
+  color: var(--accent-pale) !important;
+}
+.cafe-card:hover .cafe-card-link .arrow {
+  transform: translateX(4px);
+}
+
+/* Fav button pop & glow on card hover */
+.cafe-card-fav-btn-new {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              filter 0.3s ease !important;
+}
+.cafe-card:hover .cafe-card-fav-btn-new {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 6px var(--accent-glow)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+.cafe-card-fav-btn-new:hover {
+  transform: scale(1.3) !important;
+}
+

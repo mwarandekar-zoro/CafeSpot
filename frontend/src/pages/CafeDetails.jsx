@@ -9,6 +9,7 @@ import VibeScore from "../components/VibeScore";
 import ReviewCard from "../components/ReviewCard";
 import CafeCard from "../components/CafeCard";
 import { CafeDetailsSkeleton, ReviewCardSkeleton, CafeCardSkeleton } from "../components/Skeletons";
+import ImageGallery from "../components/ImageGallery";
 
 function RatingSelector({ label, value, onChange }) {
   return (
@@ -313,13 +314,8 @@ export default function CafeDetails() {
       <div style={{ display: "flex", gap: "40px", flexWrap: "wrap" }}>
         {/* Left Column — Images, Info, Vibe Scores */}
         <div style={{ flex: "1 1 360px", maxWidth: "480px", display: "flex", flexDirection: "column", gap: "28px" }} className="details-sidebar">
-          {/* Large Cafe Card Image */}
-          <div className="glass" style={{ overflow: "hidden", position: "relative", height: "300px" }}>
-            <img src={coverImage} alt={cafe.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-            <span className="badge badge-accent" style={{ position: "absolute", top: "16px", left: "16px" }}>
-              {cafe.category}
-            </span>
-          </div>
+          {/* Large Cafe Card Image Gallery */}
+          <ImageGallery images={cafe.images} category={cafe.category} />
 
           {/* Vibe Score summary card */}
           <div className="glass" style={{ padding: "24px" }}>
